@@ -17,6 +17,9 @@ console.log (req.session)
 export const loginView = async (req, res, next)=>{
    await res.render('login');
 }
+export const loginViewAdmin = async (req, res, next)=>{
+   await res.render('login_admin');
+}
 
 export const registerUser = async(req, res, next)=>{
     await res.render('register_usuarios');
@@ -114,8 +117,7 @@ else{
                 ruta: 'index'
             });})
                 }
-            })
-                 
+            })                 
         }
 })
             }
@@ -124,7 +126,7 @@ else{
 }
 
 // Metodo de incio de sesión
-export const loginMethod = async (req, res)=> {
+export const loginContratMethod = async (req, res)=> {
 const email = req.body.email;
 const password = req.body.password;    
 let passwordHash = await bcrypt.hash(password, 8);
@@ -147,6 +149,7 @@ if (email && password) {
             //creamos una var de session y le asignamos true si INICIO SESSION       
             req.session.loggedin = true;                
             req.session.name = results[0].Nombres;
+            req.session.rol = results[0].rol
             res.render('login', {
                 alert: true,
                 alertTitle: "Conexión exitosa",
@@ -164,7 +167,49 @@ if (email && password) {
     res.end();
 }
 };
-
+// Método de inicio de sesión para administradores
+export const loginAdminMethod = async (req, res)=> {
+    const email = req.body.email;
+    const password = req.body.password;    
+    let passwordHash = await bcrypt.hash(password, 8);
+    if (email && password) {
+        connection.query('SELECT * FROM administradores WHERE email = ?', [email], async (error, results, fields)=> {
+            if( results.length == 0 || !( await bcrypt.compare(password, results[0].contraseña)) ) {    
+                res.render('login', {
+                        alert: true,
+                        alertTitle: "Error",
+                        alertMessage: "USUARIO y/o PASSWORD incorrectas",
+                        alertIcon:'error',
+                        showConfirmButton: true,
+                        timer: false,
+                        ruta: ''    
+                    });
+                
+                //Mensaje simple y poco vistoso
+                //res.send('Incorrect Username and/or Password!');				
+            } else {         
+                //creamos una var de session y le asignamos true si INICIO SESSION       
+                req.session.loggedin = true;                
+                req.session.name = results[0].Nombres;
+                req.session.rol = results[0].rol
+                res.render('login', {
+                    alert: true,
+                    alertTitle: "Conexión exitosa",
+                    alertMessage: "¡LOGIN CORRECTO!",
+                    alertIcon:'success',
+                    showConfirmButton: false,
+                    timer: 1500,
+                    ruta: 'index'
+                });        			
+            }			
+            res.end();
+        });
+    } else {	
+        res.send('Please enter user and Password!');
+        res.end();
+    }
+    };
+    
 //12 - Método para controlar que está auth en todas las páginas
 export const loginAuth = (req, res, next)=> {
 	if (req.session.loggedin) {
