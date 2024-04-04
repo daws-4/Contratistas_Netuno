@@ -11,10 +11,15 @@
             <nav><% if (login) { %>
                 <a href="/logout">Logout</a>
                 <a class="name">Usuario conectado: <%= name %></a>
-            <%} else { %>
-                  <a href="/">Login</a>
-                  <a href="/register/" target="_self" rel="next">Sing up</a> 
-                  <% } %>
+                <% if(rol=false){ %>
+                    <a calss="name">Rol: Contratista </a>
+                <% }else{ %>
+                    <a calss="name">Rol: Contratista </a>
+                <% } %>
+                <%} else { %>
+                    <a href="/">Login</a>
+                    <a href="/register/" target="_self" rel="next">Sing up</a> 
+                <% } %>
             </nav>
         </div>
     </header>
