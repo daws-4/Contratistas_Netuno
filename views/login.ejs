@@ -1,0 +1,31 @@
+<head>
+    <link rel="stylesheet" href="/styles/register.css">
+  </head>
+  </table>
+</div>
+<body>
+  <section class="form-register">
+    <h4>INICIA SESIÓN</h4>
+    <form action="" method="POST">
+    <input class="controls" type="text" name="email" placeholder="Correo Electrónico" required tabindex="1" autofocus>
+    <input class="controls" type="password" name="password" placeholder="Contraseña"required tabindex="2">
+    <input class="botons" type="submit" value="Iniciar Sesión">
+    </form>
+
+  </section>
+
+  <script src="/styles/sweetalert210.js"></script>
+
+   <% if (typeof alert != "undefined")  { %>
+    <script>
+    Swal.fire({
+      title:'<%= alertTitle %>',
+      text:'<%= alertMessage %>',
+      icon:'<%= alertIcon %>',
+      showConfirmButton: <%= showConfirmButton %>,
+      timer: <%= timer %>
+    }).then(()=>{
+      window.location='/<%= ruta %>'
+    })
+    </script>
+  <% } %>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Corchea Redonda</title>
+    <link rel="stylesheet" href="/styles/index.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <p class="logo">Corchea Redonda</p>
+            <nav><% if (login) { %>
+                <a href="/logout">Logout</a>
+                <a class="name">Usuario conectado: <%= name %></a>
+            <%} else { %>
+                <a href="#somos">Quienes Somos</a>
+                <a href="#nuestros-programas">Nuestros Programas</a>
+                  <a href="/login/">Login</a>
+                  <a href="/register/" target="_self" rel="next">Sing up</a> 
+                  <% } %>
+            </nav>
+        </div>
+    </header>
+<section id="hero">
+    <h1>Aprende música <br>de Forma Autodidacta</h1>
+</section>
+
+<section id="aprende-tocar">
+    <div class="container">
+        <h1>Aprende a tocar...</h1>
+        <div class="instrumentos">
+            <div class="piano">
+                <a href="" ><picture><img src="/styles/media\instrumentos\piano.png" alt="" class="img-ins"></picture></a>
+            </div>
+            <div class="guitarra">
+                <a href="" ><picture><img src="/styles/media\instrumentos\guitarra.jpg" alt="" class="img-ins"></picture></a>
+            </div>
+            <div class="batería">
+                <a href="" ><picture><img src="/styles/media\instrumentos\bateria.jpg" alt="" class="img-ins"></picture></a>
+            </div>
+            <div class="bajo">
+                <a href="" ><picture><img src="/styles/media\instrumentos\bajo.png" alt="" class="img-ins"></picture></a>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+<section id="nuestros-programas">
+    <div class="container">
+        <h2>Nuestros Programas</h2>
+        <div class="programas">
+            <div class="carta">
+                <h3>Aprende!</h3>
+                <p>Nuestro curso de aprendizaje especializado para princpiantes donde podrás entender todos los conceptos teóricos básicos de la música para poder empezar a tocar cualquier instrumento</p>
+                <button>IR</button>
+            </div>
+            <div class="carta">
+                <h3>Juega!</h3>
+                <p>Apartado de juegos interactivos donde podrás practicar las cosas aprendidas y aprender nuevas técnicas musicales de forma didáctica y retroalimentativa </p>
+                <button>IR</button>
+            </div>
+            <div class="carta">
+                <h3>Comunidad</h3>
+                <p>Únete a nuestra comunidad de tutoriales de música en cualquier instrumento para aprender canciones, técnicas y demás cosas útiles para progresar en la música</p>
+                <button>IR</button>
+            </div>  
+        </div>
+    </div>
+</section>
+
+
+<section id="somos">
+    <div class="container">
+        <div class="img-container"></div>
+        <div class="texto">
+
+            <h2>Somos <span class="color-acento">Corchea Redonda</span></h2>
+            <h3>Visión</h3>
+            <p>Convertirse en la página de preferencia del público estudiantil musical, obtener gran repertorio en tutoriales de canciones de diversos géneros musicales, crear motivación e inspiración para todos aquellos músicos en proceso que están empezando o se quedan atascados en su aprendizaje musical.</p>
+            <h3>Misión</h3>
+            <p>Nuestra misión es ser la herramienta o el puente para todos aquellos estudiantes que, con ganas de aprender y progresar en su aprendizaje musical, se comprometen a mantener constacia en su estudio de técnica y teoriía. Además de ser una fuente de información para todos aquellos músicos quienes busquen ampliar su repertorio.</p>
+        </div>
+    </div>
+    <button class="boton">SUBIR</button>
+</section>
+<script src="/styles/scriptindex.js"></script>
+<%- include("partials/_footer") %>

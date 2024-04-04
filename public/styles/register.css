@@ -1,0 +1,99 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Roboto', sans-serif;
+}
+
+body {
+  background-image: url('/styles/registermedia/fondo.jpg');
+  font-family: 'Roboto', sans-serif;
+}
+
+.form-register {
+  width: 400px;
+  background: #101d14;
+  padding: 32px;
+  margin: auto;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  font-family: 'calibri';
+  color: white;
+  box-shadow: 7px 13px 37px #000;
+}
+
+.form-register h4 {
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+
+.controls {
+  width: 100%;
+  background: #24303c;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  border: 1px solid #24c51f;
+  font-family: 'calibri';
+  font-size: 18px;
+  color: white;
+}
+
+.form-register p {
+  height: 40px;
+  text-align: center;
+  font-size: 16px;
+  line-height: 28px;
+}
+
+.form-register a {
+  color: white;
+  text-decoration: none;
+}
+
+.form-register a:hover {
+  color: white;
+  text-decoration: underline;
+}
+
+.form-register .botons {
+  width: 100%;
+  background: #468811;
+  border-color: #24303c;
+  padding: 12px;
+  color: white;
+  margin: 16px 0;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.form-register .botons:hover{
+  background: #6ac51f;
+}
+
+footer{
+  background-color: rgb(230,230,230);
+  width: 100%;
+  left: 0;
+  bottom: 0;
+  position: fixed;
+
+}
+
+footer p{
+  margin: 0;
+  padding: 12px;
+  color: rgb(100,100,100);
+  right: 0;
+  bottom: 0;
+  position: fixed;
+
+}
+
+footer .container{
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}

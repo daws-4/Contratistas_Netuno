@@ -1,0 +1,35 @@
+      <head>
+        <link rel="stylesheet" href="/styles/register.css">
+      </head>
+      </table>
+    </div>
+    <body>
+      <section class="form-register">
+        <h4>REGISTRATE</h4>
+        <form action="" method="POST">
+        <input class="controls" type="text" name="username" placeholder="Nombre de Usuario" required tabindex="1" autofocus>
+        <input class="controls" type="email" name="email" placeholder="email" required tabindex="2">
+        <input class="controls" type="password" name="pass" placeholder="Contraseña" required tabindex="3">
+        <p>Estoy de acuerdo con <a href="#">Terminos y Condiciones</a></p>
+        <input class="botons" type="submit" value="Registrar">
+        </form>
+        <p><a href="/login">¿Ya tengo Cuenta?</a></p>
+
+      </section>
+      <script src="/styles/sweetalert210.js"></script>
+
+<% if (typeof alert != "undefined")  { %>
+ <script>
+ Swal.fire({
+   title:'<%= alertTitle %>',
+   text:'<%= alertMessage %>',
+   icon:'<%= alertIcon %>',
+   showConfirmButton: <%= showConfirmButton %>,
+   timer: <%= timer %>
+ }).then(()=>{
+   window.location='/<%= ruta %>'
+ })
+ </script>
+<% } %>
+    
+<%- include("partials/_footer") %>
