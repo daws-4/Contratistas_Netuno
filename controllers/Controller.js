@@ -57,48 +57,69 @@ else{
             ruta: 'register'
         });
     }else{
-    connection.query ('SELECT * FROM contratistas WHERE email = ?', [email], async (error, results, fields)=> {   
-            if (n_telefono == results[0].n_telefono) {
-               res.render('register_usuarios', {
-                alert: true,
-                alertTitle: "Error",
-                alertMessage: "Datos ya existentes (telefono)",
-                alertIcon:'error',
-                showConfirmButton: true,
-                timer: false,
-                ruta: 'register'   })
-            } else if (email == results[0].email) {
+    connection.query ('SELECT * FROM contratistas WHERE email = ?', [email], async (error, results, fields)=> {
+        let resultados_array = [  '',  '',  '', '',  '',  '',  '',  '',  '', '' ]
+       if (results != 0){
+        resultados_array = results
+       }
+        console.log((resultados_array))
+        if (results.length != 0 || email == resultados_array[0].email) {
+                        res.render('register_usuarios', {
+                            alert: true,
+                            alertTitle: "Error",
+                            alertMessage: "Datos ya existentes (Correo Electrónico)",
+                            alertIcon:'error',
+                            showConfirmButton: true,
+                            timer: false,
+                            ruta: 'register'   })
+        } else {
+            connection.query ('SELECT * FROM contratistas WHERE n_telefono = ?', [n_telefono], async (error, results, fields)=> {
+                let resultados_array = [  '',  '',  '', '',  '',  '',  '',  '',  '', '' ]
+       if (results != 0){
+        resultados_array = results
+       }
+                if (results.length != 0 || n_telefono == resultados_array[0].n_telefono) {
                 res.render('register_usuarios', {
                     alert: true,
                     alertTitle: "Error",
-                    alertMessage: "Datos ya existentes (email)",
+                    alertMessage: "Datos ya existentes (Número de Teléfono)",
                     alertIcon:'error',
                     showConfirmButton: true,
                     timer: false,
                     ruta: 'register'   })
-                } else if (c_identidad == results[0].c_identidad){
+            } else {
+            connection.query('SELECT * FROM contratistas WHERE c_identidad =?', [c_identidad], async (error, results, fields)=> {
+                let resultados_array = [  '',  '',  '', '',  '',  '',  '',  '',  '', '' ]
+       if (results != 0){
+        resultados_array = results
+       }
+                if (results.length != 0 || c_identidad == resultados_array[0].c_identidad) {
                     res.render('register_usuarios', {
                         alert: true,
                         alertTitle: "Error",
-                        alertMessage: "Datos ya existentes (Cédulla de Identidad)",
+                        alertMessage: "Datos ya existentes (Cédula de Identidad)",
                         alertIcon:'error',
                         showConfirmButton: true,
                         timer: false,
                         ruta: 'register'   })
-                    } else {
-let passwordHash = await bcrypt.hash(pass, 8);  
-    connection.query('INSERT INTO contratistas SET ?',{n_telefono:n_telefono, email:email, c_identidad:c_identidad, Nombres:nombres, Apellidos:apellidos, empresa_contratista:empresa_contratista,contraseña:passwordHash}, async (error,results) =>{ res.render('register_usuarios', {
-        alert: true,
-        alertTitle: "Registration",
-        alertMessage: "¡Successful Registration!",
-        alertIcon:'success',
-        showConfirmButton: false,
-        timer: 1500,
-        ruta: 'index'
-    });})
-       
-        //res.redirect('/');         
-                      }})
+                } else {
+                    let passwordHash = await bcrypt.hash(pass, 8);  
+            connection.query('INSERT INTO contratistas SET ?',{n_telefono:n_telefono, email:email, c_identidad:c_identidad, Nombres:nombres, Apellidos:apellidos, empresa_contratista:empresa_contratista,contraseña:passwordHash}, async (error,results) =>{ res.render('register_usuarios', {
+                alert: true,
+                alertTitle: "Registration",
+                alertMessage: "¡Successful Registration!",
+                alertIcon:'success',
+                showConfirmButton: false,
+                timer: 1500,
+                ruta: 'index'
+            });})
+                }
+            })
+                 
+        }
+})
+            }
+    })        
 }}
 }
 
