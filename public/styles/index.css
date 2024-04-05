@@ -3,6 +3,8 @@
 }
 
 html{
+    min-height: 100%;
+    position: relative;
     scroll-behavior: smooth;
 }
 
@@ -143,7 +145,7 @@ header .name:hover{
     margin: 30px;
     border-radius: 15px;
 }
-#aprende-tocar .instrumentos
+#aprende-tocar .abrir-cerrar
 {
     display: flex;
     align-items: center;
@@ -228,17 +230,21 @@ header .name:hover{
 }
 
 footer{
+    width: 100%;
+    position: absolute;
+    bottom: 0;
     background-color: rgb(230,230,230);
 }
 
 footer p{
+    position: relative;
     margin: 0;
     padding: 2%;
     color: rgb(100,100,100);
 }
 
 footer .container{
-    height: 80px;
+    height: 60px;
     display: flex;
     justify-content: center;
     align-items: flex-end;

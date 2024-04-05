@@ -215,7 +215,8 @@ export const loginAuth = (req, res, next)=> {
 	if (req.session.loggedin) {
 		res.render('index',{
 			login: true,
-			name: req.session.name	
+			name: req.session.name,
+            rol: req.session.rol
 		});
 	} else {
 		res.render('index',{
