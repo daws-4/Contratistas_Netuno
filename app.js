@@ -24,7 +24,8 @@ app.use(morgan("dev"));
 app.use(session({
 	secret: 'secret',
 	resave: true,
-	saveUninitialized: true
+	saveUninitialized: true,
+  cookie: {maxAge: (2* 60* 60* 1000)}
 }));
 
 //Invocamos a dotenv

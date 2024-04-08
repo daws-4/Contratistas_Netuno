@@ -14,16 +14,16 @@ import { connection } from "../app.js";
 console.log (req.session)
 }
 */
-export const loginView = async (req, res, next)=>{
-   await res.render('login');
-}
-export const loginViewAdmin = async (req, res, next)=>{
-   await res.render('login_admin');
-}
+// export const loginView = async (req, res, next)=>{
+//    await res.render('login');
+// }
+// export const loginViewAdmin = async (req, res, next)=>{
+//    await res.render('login_admin');
+// }
 
-export const registerUser = async(req, res, next)=>{
-    await res.render('register_usuarios');
-}
+// export const registerUser = async(req, res, next)=>{
+//     await res.render('register_contratistas');
+// }
 
 
 // Método para registro de contratistas
@@ -124,16 +124,16 @@ else{
     })        
 }}
 }
-
 // Metodo de incio de sesión
 export const loginContratMethod = async (req, res)=> {
 const email = req.body.email;
-const password = req.body.password;    
+const password = req.body.password;
 let passwordHash = await bcrypt.hash(password, 8);
 if (email && password) {
     connection.query('SELECT * FROM contratistas WHERE email = ?', [email], async (error, results, fields)=> {
         if( results.length == 0 || !( await bcrypt.compare(password, results[0].contraseña)) ) {    
             res.render('login', {
+                    login: false,
                     alert: true,
                     alertTitle: "Error",
                     alertMessage: "USUARIO y/o PASSWORD incorrectas",
@@ -151,6 +151,7 @@ if (email && password) {
             req.session.name = results[0].Nombres;
             req.session.rol = results[0].rol
             res.render('login', {
+                login:false,
                 alert: true,
                 alertTitle: "Conexión exitosa",
                 alertMessage: "¡LOGIN CORRECTO!",
@@ -176,13 +177,14 @@ export const loginAdminMethod = async (req, res)=> {
         connection.query('SELECT * FROM administradores WHERE email = ?', [email], async (error, results, fields)=> {
             if( results.length == 0 || !( await bcrypt.compare(password, results[0].contraseña)) ) {    
                 res.render('login', {
+                        login: false,
                         alert: true,
                         alertTitle: "Error",
                         alertMessage: "USUARIO y/o PASSWORD incorrectas",
                         alertIcon:'error',
                         showConfirmButton: true,
                         timer: false,
-                        ruta: ''    
+                        ruta: '',
                     });
                 
                 //Mensaje simple y poco vistoso
@@ -193,13 +195,14 @@ export const loginAdminMethod = async (req, res)=> {
                 req.session.name = results[0].Nombres;
                 req.session.rol = results[0].rol
                 res.render('login', {
+                    login: false,
                     alert: true,
                     alertTitle: "Conexión exitosa",
                     alertMessage: "¡LOGIN CORRECTO!",
                     alertIcon:'success',
                     showConfirmButton: false,
                     timer: 1500,
-                    ruta: 'index'
+                    ruta: 'index',
                 });        			
             }			
             res.end();
@@ -210,25 +213,76 @@ export const loginAdminMethod = async (req, res)=> {
     }
     };
     
-//12 - Método para controlar que está auth en todas las páginas
-export const loginAuth = (req, res, next)=> {
+//Método para controlar que está auth en todas las páginas
+export const loginAuth = async (req, res)=> {
 	if (req.session.loggedin) {
-		res.render('index',{
+        console.log(req.session.loggedin)
+		await res.render('index',{
 			login: true,
 			name: req.session.name,
             rol: req.session.rol
 		});
 	} else {
-		res.render('index',{
+        console.log(req.session.loggedin)
+		await res.render('index',{
 			login:false,
-			name:'Debe iniciar sesión',			
+			name:'Debe iniciar sesión',		
+		});				
+	}
+};
+export const loginAdminView = async(req, res)=> {
+	if (req.session.loggedin) {
+        console.log(req.session.loggedin)
+		await res.render('login_admin',{
+			login: true,
+			name: req.session.name,
+            rol: req.session.rol
+		});
+	} else {
+        console.log(req.session.loggedin)
+		await res.render('login_admin',{
+			login:false,
+			name:'Debe iniciar sesión',		
+		});				
+	}
+};
+export const loginView = async(req, res)=> {
+	if (req.session.loggedin) {
+        console.log(req.session.loggedin)
+		await res.render('login',{
+			login: true,
+			name: req.session.name,
+            rol: req.session.rol
+		});
+	} else {
+        console.log(req.session.loggedin)
+		await res.render('login',{
+			login:false,
+			name:'Debe iniciar sesión',		
+		});				
+	}
+};
+export const registerUser = async(req, res)=> {
+	if (req.session.loggedin) {
+        console.log(req.session.loggedin)
+		await res.render('register_contratistas',{
+			login: true,
+			name: req.session.name,
+            rol: req.session.rol
+		});
+	} else {
+        console.log(req.session.loggedin)
+		await res.render('register_contratistas',{
+            rol: false,
+			login:false,
+			name:'Debe iniciar sesión',		
 		});				
 	}
 };
 
 
 //función para limpiar la caché luego del logout
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
     if (!req.user)
         res.header('Cache-Control', 'private, no-cache, no-store, must-revalidate');
     next();
