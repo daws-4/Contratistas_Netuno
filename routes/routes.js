@@ -8,7 +8,7 @@ import {
     loginView,
     registerUser,
     loginAdminView,
-} from '../controllers/Controller.js'
+} from '../controllers/Controller_login.js'
 const router = Router();
 
 router.get('/index',  loginAuth);
