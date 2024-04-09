@@ -6,6 +6,10 @@ import bcrypt from "bcryptjs"
 import mysql from 'mysql'
 import { pool } from "../database/db.js";
 import { connection } from "../app.js";
+import { Server } from "socket.io";
+import { io } from "../app.js";
+
+
 
 /*export const index = (req, res, next)=>{
  res.render('index')
@@ -40,7 +44,7 @@ if (email && password) {
                     login: false,
                     alert: true,
                     alertTitle: "Error",
-                    alertMessage: "USUARIO y/o PASSWORD incorrectas",
+                    alertMessage: "USUARIO y/o CONTRASEÑA incorrectos",
                     alertIcon:'error',
                     showConfirmButton: true,
                     timer: false,
@@ -54,6 +58,8 @@ if (email && password) {
             req.session.loggedin = true;                
             req.session.name = results[0].Nombres;
             req.session.rol = results[0].rol
+            req.session.sexo = results [0].sexo
+            req.session.c_identidad = results [0].C_Identidad
             res.render('login', {
                 login:false,
                 alert: true,
@@ -84,7 +90,7 @@ export const loginAdminMethod = async (req, res)=> {
                         login: false,
                         alert: true,
                         alertTitle: "Error",
-                        alertMessage: "USUARIO y/o PASSWORD incorrectas",
+                        alertMessage: "USUARIO y/o CONTRASEÑA incorrectos",
                         alertIcon:'error',
                         showConfirmButton: true,
                         timer: false,
@@ -95,10 +101,11 @@ export const loginAdminMethod = async (req, res)=> {
                 //res.send('Incorrect Username and/or Password!');				
             } else {         
                 //creamos una var de session y le asignamos true si INICIO SESSION       
-                req.session.loggedin = true;                
-                req.session.name = results[0].Nombres;
+                req.session.loggedin = true            
+                req.session.name = results[0].Nombres
                 req.session.rol = results[0].rol
                 req.session.email = results[0].email
+                req.session.sexo = results [0].sexo
                 res.render('login', {
                     login: false,
                     alert: true,
@@ -118,14 +125,24 @@ export const loginAdminMethod = async (req, res)=> {
     }
     };
     
-//Método para controlar que está auth en todas las páginas
-export const loginAuth = async (req, res)=> {
+//Método para controlar que está auth en todas las páginas - renderizado de las páginas
+
+export const connectionSocket =  async (req,res)=>{
+    io.on('connection', (socket) => {
+        console.log('a user connected');
+        socket.on('disconnect', () => {
+          console.log('user disconnected');
+        });
+      });
+}
+export const loginAuth = async (req, res, next)=> {
 	if (req.session.loggedin) {
         console.log(req.session.loggedin)
 		await res.render('index',{
 			login: true,
 			name: req.session.name,
-            rol: req.session.rol
+            rol: req.session.rol,
+            sexo: req.session.sexo
 		});
 	} else {
         console.log(req.session.loggedin)
@@ -297,6 +314,11 @@ export const registerMethod = async (req, res)=>{
 }
 
 
+app.use(function (req,res,next){
+    if (req.user){
+    }
+})
+
 
 //función para limpiar la caché luego del logout
 app.use(function (req, res, next) {
@@ -305,6 +327,7 @@ app.use(function (req, res, next) {
     next();
 });
 
+
 //Logout
 //Destruye la sesión.
 export const logout = function (req, res, next) {
@@ -312,3 +335,8 @@ req.session.destroy(() => {
   res.redirect('/') // siempre se ejecutará después de que se destruya la sesión
 })
 };
+
+
+
+//Método para requerir los datos de los contratos cargados en la DB
+

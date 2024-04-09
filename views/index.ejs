@@ -1,40 +1,72 @@
 <%- include("partials/_head") %>
     <% if (login) {%>
-        <% if (rol) {%>
+<!--Menu superior ADMINISTRADORES--> <% if (rol) {%>
 
 </head>
 <body>
-    <!--Menu superior-->
+    
     <section class="bienvenidos">
         <%- include("partials/_header_logged_admin") %>
 
-
-        <% }else{ %>
+    </section>
+ <!--Menu superior CONTRATISTAS--><% }else{ %>
 
 
 </head>
  <body>
-     <!--Menu superior-->
+     
     <section class="bienvenidos">
             <%- include("partials/_header_logged_contratistas") %>
+
+            <div class="welcomers text-center">
+                <% if (sexo) { %>
+           
+                   <h5 id="welcomers" class=" wow bounceIn">Bienvenida </h5> <h5 class="nombre_contrat wow bounceIn"> <%=name %> </h5>
+
+               <% }else{ %>
+
+                   <h5 id="welcomers" class=" wow bounceIn">Bienvenido </h5> <h5 class="nombre_contrat wow bounceIn"> <%=name %> </h5>
+
+              <% } %>
+              </div>
+              <div>
+                <h6 id="welcomers"> CONTRATOS</h6>
+                <table class="principal-table table-striped">
+                    <thead> 
+                        <tr >
+                            <th>Fecha Instalación</th>
+                            <th>ID del contrato</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr> 
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+              </div>
 
 
             <% } %>
 
-
-            <% }else { %>
+        </section>
+<!--Menu superior--><% }else { %>
             </head>
             <body>
-                <!--Menu superior-->
+              
                 <section class="bienvenidos">
                     <%- include("partials/_header") %>
                     <% } %>
-            <h6>Bienvenid</h6>
-
-
-
-
-
+            
+                    
     </section>
 
 
@@ -77,6 +109,10 @@
     <script src="contratistas-styles/js/wow.min.js"></script>
     <script src="contratistas-styles/js/smooth-scroll.min.js"></script>
     <script src="contratistas-styles/js/sitio.js"></script>
+    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script type="text/javascript">
+        const socket = io()
+    </script>
 </body>
 
 </html>

@@ -8,10 +8,11 @@ import {
     loginView,
     registerUser,
     loginAdminView,
-} from '../controllers/Controller_login.js'
+    connectionSocket,
+} from '../controllers/Controller.js'
 const router = Router();
 
-router.get('/index',  loginAuth);
+router.get('/index', connectionSocket,  loginAuth);
 router.get('/', loginView);
 router.post('/', loginContratMethod);
 router.get('/admin', loginAdminView)

@@ -4,13 +4,19 @@ import morgan from "morgan";
 import bodyParser from 'body-parser'
 import { fileURLToPath } from "url";
 import bcrypt from "bcryptjs"
-
+import { Server }from "socket.io"
 import session from 'express-session'
-
 import router from "./routes/routes.js";
+
+
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+
+const server = app.listen(3000, (req, res)=>{
+  console.log('SERVER RUNNING IN http://localhost:3000');
+});
+export const io = new Server(server);
 // settings
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
@@ -36,6 +42,7 @@ dotenv.config({ path: './env/.env'});
 app.use('/resources',express.static('public'));
 app.use('/resources', express.static(__dirname + '/public'));
 app.use(express.static(path.join(__dirname, "public")));
+
 
 
 // Establecemos el motor de plantillas
@@ -64,8 +71,9 @@ connection.connect((error)=>{
   });
 
 
+  
   app.use(router)
+ 
+  
 
-app.listen(3000, (req, res)=>{
-    console.log('SERVER RUNNING IN http://localhost:3000');
-});
+ 

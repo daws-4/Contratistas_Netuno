@@ -5,10 +5,36 @@ body {
   font-family: 'Open Sans', sans-serif;
   color: #111111; }
 
+  
+  .welcomers{
+    text-align: left;
+    display: flex;
+    margin-top: 10%;
+  }
+
+  .welcomers .nombre_contrat{
+    font-weight: bold;
+    padding: 1rem;
+  }
+  #welcomers{
+    text-align: left;
+    display: flex;
+    padding: 1rem;
+  }
+
+  .principal-table{
+    padding: 1rem;
+    margin: 1rem;
+    caption-side: top;
+    table-layout: auto;
+    border-collapse: collapse;
+    border-spacing: 3rem;
+    border-style: dashed;
+    
+  }
 .bienvenidos {
-  color: #fff;
-  background-size: cover;
-  background-attachment: fixed !important;
+  color: #111111;
+  background-color: #fff;
   height: 100vh;
   display: -webkit-box;
   display: -ms-flexbox;
