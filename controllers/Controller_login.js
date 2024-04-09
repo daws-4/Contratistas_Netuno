@@ -27,103 +27,7 @@ console.log (req.session)
 
 
 // Método para registro de contratistas
-export const registerMethod = async (req, res)=>{
-const c_identidad = req.body.c_identidad;
-const email = req.body.email;
-const pass = req.body.pass;
-const n_telefono = req.body.n_telefono
-const nombres = req.body.nombres
-const apellidos = req.body.apellidos
-const empresa_contratista = req.body.empresa_contratista
-    // results[0].n_telefono = 0
-    // results[0].email = 0
-    // results[0].c_identidad = 0
-if (pass.length < 7){
-    res.render('register', {
-        alert: true,
-        alertTitle: "Error",
-        alertMessage: "La Contraseña debe ser de 8 carácteres mínimo",
-        alertIcon:'error',
-        showConfirmButton: true,
-        timer: false,
-        ruta: 'register'   
-    });}
-else{
-    if (!(email && c_identidad && pass && n_telefono && nombres && apellidos && empresa_contratista)){
-        res.render('register_usuarios', {
-            alert: true,
-            alertTitle: "Error",
-            alertMessage: "Complete todos los campos",
-            alertIcon:'error',
-            showConfirmButton: true,
-            timer: false,
-            ruta: 'register'
-        });
-    }else{
-    connection.query ('SELECT * FROM contratistas WHERE email = ?', [email], async (error, results, fields)=> {
-        let resultados_array = [  '',  '',  '', '',  '',  '',  '',  '',  '', '' ]
-       if (results != 0){
-        resultados_array = results
-       }
-        console.log((resultados_array))
-        if (results.length != 0 || email == resultados_array[0].email) {
-                        res.render('register_usuarios', {
-                            alert: true,
-                            alertTitle: "Error",
-                            alertMessage: "Datos ya existentes (Correo Electrónico)",
-                            alertIcon:'error',
-                            showConfirmButton: true,
-                            timer: false,
-                            ruta: 'register'   })
-        } else {
-            connection.query ('SELECT * FROM contratistas WHERE n_telefono = ?', [n_telefono], async (error, results, fields)=> {
-                let resultados_array = [  '',  '',  '', '',  '',  '',  '',  '',  '', '' ]
-       if (results != 0){
-        resultados_array = results
-       }
-                if (results.length != 0 || n_telefono == resultados_array[0].n_telefono) {
-                res.render('register_usuarios', {
-                    alert: true,
-                    alertTitle: "Error",
-                    alertMessage: "Datos ya existentes (Número de Teléfono)",
-                    alertIcon:'error',
-                    showConfirmButton: true,
-                    timer: false,
-                    ruta: 'register'   })
-            } else {
-            connection.query('SELECT * FROM contratistas WHERE c_identidad =?', [c_identidad], async (error, results, fields)=> {
-                let resultados_array = [  '',  '',  '', '',  '',  '',  '',  '',  '', '' ]
-       if (results != 0){
-        resultados_array = results
-       }
-                if (results.length != 0 || c_identidad == resultados_array[0].c_identidad) {
-                    res.render('register_usuarios', {
-                        alert: true,
-                        alertTitle: "Error",
-                        alertMessage: "Datos ya existentes (Cédula de Identidad)",
-                        alertIcon:'error',
-                        showConfirmButton: true,
-                        timer: false,
-                        ruta: 'register'   })
-                } else {
-                    let passwordHash = await bcrypt.hash(pass, 8);  
-            connection.query('INSERT INTO contratistas SET ?',{n_telefono:n_telefono, email:email, c_identidad:c_identidad, Nombres:nombres, Apellidos:apellidos, empresa_contratista:empresa_contratista,contraseña:passwordHash}, async (error,results) =>{ res.render('register_usuarios', {
-                alert: true,
-                alertTitle: "Registration",
-                alertMessage: "¡Successful Registration!",
-                alertIcon:'success',
-                showConfirmButton: false,
-                timer: 1500,
-                ruta: 'index'
-            });})
-                }
-            })                 
-        }
-})
-            }
-    })        
-}}
-}
+
 // Metodo de incio de sesión
 export const loginContratMethod = async (req, res)=> {
 const email = req.body.email;
@@ -194,6 +98,7 @@ export const loginAdminMethod = async (req, res)=> {
                 req.session.loggedin = true;                
                 req.session.name = results[0].Nombres;
                 req.session.rol = results[0].rol
+                req.session.email = results[0].email
                 res.render('login', {
                     login: false,
                     alert: true,
@@ -224,10 +129,7 @@ export const loginAuth = async (req, res)=> {
 		});
 	} else {
         console.log(req.session.loggedin)
-		await res.render('index',{
-			login:false,
-			name:'Debe iniciar sesión',		
-		});				
+		await res.redirect('/');				
 	}
 };
 export const loginAdminView = async(req, res)=> {
@@ -268,17 +170,132 @@ export const registerUser = async(req, res)=> {
 		await res.render('register_contratistas',{
 			login: true,
 			name: req.session.name,
-            rol: req.session.rol
+            rol: req.session.rol,
+            admin_email: req.session.email
 		});
 	} else {
         console.log(req.session.loggedin)
 		await res.render('register_contratistas',{
             rol: false,
 			login:false,
-			name:'Debe iniciar sesión',		
+			name:'Debe iniciar sesión',	
+            admin_email: false	
 		});				
 	}
 };
+
+
+export const registerMethod = async (req, res)=>{
+    const c_identidad = req.body.c_identidad
+    const email = req.body.email
+    const pass = req.body.pass
+    const n_telefono = req.body.n_telefono
+    const nombres = req.body.nombres
+    const apellidos = req.body.apellidos
+    const empresa_contratista = req.body.empresa_contratista
+    const sexo = req.body.sexo
+    const confirm_pass = req.body.confirm_pass
+     if (!(email && c_identidad && pass && n_telefono && nombres && apellidos && confirm_pass)){
+         await   res.render('register_contratistas', {
+                login: true,
+                rol:true,
+                alert: true,
+                alertTitle: "Error",
+                alertMessage: "Complete todos los campos",
+                alertIcon:'error',
+                showConfirmButton: true,
+                timer: false,
+                ruta: 'register'
+            });
+    
+        }else if (!(pass==confirm_pass)){
+            await res.render('register_contratistas', {
+                login: true,
+                rol:true,
+                alert: true,
+                alertTitle: "Error",
+                alertMessage: "Contraseñas no coinciden",
+                alertIcon:'error',
+                showConfirmButton: true,
+                timer: false,
+                ruta: 'register'
+            });
+    
+    
+        }else{
+        connection.query ('SELECT * FROM contratistas WHERE email = ?', [email], async (error, results, fields)=> {
+            let resultados_array = [  '',  '',  '', '',  '',  '',  '']
+           if (results != 0){
+            resultados_array = results
+           }
+            console.log((resultados_array))
+            if (results.length != 0 || email == resultados_array[0].email) {
+                            res.render('register_contratistas', {
+                                login: true,
+                                rol:true,
+                                alert: true,
+                                alertTitle: "Error",
+                                alertMessage: "Datos ya existentes (Correo Electrónico)",
+                                alertIcon:'error',
+                                showConfirmButton: true,
+                                timer: false,
+                                ruta: 'register'   })
+            } else {
+                connection.query ('SELECT * FROM contratistas WHERE n_telefono = ?', [n_telefono], async (error, results, fields)=> {
+                    let resultados_array = [  '',  '',  '', '',  '',  '',  '',  '',  '', '', '' ]
+           if (results != 0){
+            resultados_array = results
+           }
+                    if (results.length != 0 || n_telefono == resultados_array[0].n_telefono) {
+                    res.render('register_contratistas', {
+                        login: true,
+                        rol:true,
+                        alert: true,
+                        alertTitle: "Error",
+                        alertMessage: "Datos ya existentes (Número de Teléfono)",
+                        alertIcon:'error',
+                        showConfirmButton: true,
+                        timer: false,
+                        ruta: 'register'   })
+                } else {
+                connection.query('SELECT * FROM contratistas WHERE c_identidad =?', [c_identidad], async (error, results, fields)=> {
+                    let resultados_array = [  '',  '',  '', '',  '',  '',  '',  '',  '', '', '' ]
+           if (results != 0){
+            resultados_array = results
+           }
+                    if (results.length != 0 || c_identidad == resultados_array[0].c_identidad) {
+                        res.render('register_contratistas', {
+                            login: true,
+                            rol:true,
+                            alert: true,
+                            alertTitle: "Error",
+                            alertMessage: "Datos ya existentes (Cédula de Identidad)",
+                            alertIcon:'error',
+                            showConfirmButton: true,
+                            timer: false,
+                            ruta: 'register'   })
+                    } else {
+                        let passwordHash = await bcrypt.hash(pass, 8);  
+                connection.query('INSERT INTO contratistas SET ?',{n_telefono:n_telefono, email:email, c_identidad:c_identidad, Nombres:nombres, Apellidos:apellidos, empresa_contratista:empresa_contratista, contraseña:passwordHash, sexo:sexo}, async (error,results) =>{ res.render('register_contratistas', {
+                    login: true,
+                    rol:true,
+                    alert: true,
+                    alertTitle: "Registration",
+                    alertMessage: "¡Successful Registration!",
+                    alertIcon:'success',
+                    showConfirmButton: false,
+                    timer: 1500,
+                    ruta: 'index'
+                });})
+                    }
+                })                 
+            }
+    })
+                }
+        })        
+    }
+}
+
 
 
 //función para limpiar la caché luego del logout

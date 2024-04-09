@@ -35,3 +35,6 @@ $(window).scroll(function () {
         nav.removeClass("fondo-menu");
     }
 });
+
+const btnToggle = document.querySelector('.toggle-btn');
+
