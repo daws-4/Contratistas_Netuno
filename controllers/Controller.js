@@ -127,13 +127,14 @@ export const loginAdminMethod = async (req, res)=> {
     
 //Método para controlar que está auth en todas las páginas - renderizado de las páginas
 
-export const connectionSocket =  async (req,res)=>{
+export const connectionSocket =  async (req,res,next)=>{
     io.on('connection', (socket) => {
         console.log('a user connected');
         socket.on('disconnect', () => {
           console.log('user disconnected');
         });
       });
+      next()
 }
 export const loginAuth = async (req, res, next)=> {
 	if (req.session.loggedin) {
