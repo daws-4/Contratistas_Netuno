@@ -31,20 +31,27 @@
               </div>
               <div>
                 <h6 id="welcomers"> CONTRATOS</h6>
-                <table class="principal-table table-striped">
+                <table id="lista-contratos" class="principal-table table-striped">
                     <thead> 
-                        <tr >
-                            <th>Fecha Instalación</th>
+                        <tr>
+                            <th>Fecha contrato</th>
                             <th>ID del contrato</th>
                             <th>Status</th>
                         </tr>
                     </thead>
+                    <% if (contratos[0] != undefined) {%>
                     <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                    <% for (let index = 0; index < contratos[0].length; index++) { %>
+                        <tr >
+                            <td><a href=""><%=contratos[0][index].fecha_contrato %></a></td>
+                            <td><a href=""><%=contratos[0][index].id %></a></td>
+                            <% if (contratos[0][index].estatus_ == 0){%>
+                            <td>Agendado</td>
+                            <% }else{ %>
+                            <td>Emitido</td>
+                            <% } %>
                         </tr> 
+                    <% } %>
                     </tbody>
                     <tfoot>
                         <tr>
@@ -53,9 +60,25 @@
                     </tfoot>
                 </table>
               </div>
-
-
+            <% }else{ %>
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr> 
             <% } %>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+      </div>
+
+
+                <% } %>
 
         </section>
 <!--Menu superior--><% }else { %>

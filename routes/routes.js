@@ -8,11 +8,11 @@ import {
     loginView,
     registerUser,
     loginAdminView,
-    connectionSocket,
+    reqContratos,
 } from '../controllers/Controller.js'
 const router = Router();
 
-router.get('/index', connectionSocket,  loginAuth);
+router.get('/index', loginAuth, reqContratos);
 router.get('/', loginView);
 router.post('/', loginContratMethod);
 router.get('/admin', loginAdminView)

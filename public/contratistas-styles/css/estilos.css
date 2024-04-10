@@ -29,8 +29,20 @@ body {
     table-layout: auto;
     border-collapse: collapse;
     border-spacing: 3rem;
-    border-style: dashed;
-    
+    border-style: outset;
+  }
+  .principal-table thead{
+    border-style: groove;
+  }
+  .principal-table thead tr th{ 
+    padding: 1rem;
+  }
+  .principal-table tbody tr{
+    border-color: #064e4e;
+    border-style: solid;
+  }
+  .principal-table tbody tr td{
+    padding: 0.5rem;
   }
 .bienvenidos {
   color: #111111;

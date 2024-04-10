@@ -58,8 +58,8 @@ if (email && password) {
             req.session.loggedin = true;                
             req.session.name = results[0].Nombres;
             req.session.rol = results[0].rol
-            req.session.sexo = results [0].sexo
-            req.session.c_identidad = results [0].C_Identidad
+            req.session.sexo = results[0].sexo
+            req.session.c_identidad = results[0].C_Identidad
             res.render('login', {
                 login:false,
                 alert: true,
@@ -100,6 +100,7 @@ export const loginAdminMethod = async (req, res)=> {
                 //Mensaje simple y poco vistoso
                 //res.send('Incorrect Username and/or Password!');				
             } else {         
+                console.log(results[0])
                 //creamos una var de session y le asignamos true si INICIO SESSION       
                 req.session.loggedin = true            
                 req.session.name = results[0].Nombres
@@ -127,28 +128,43 @@ export const loginAdminMethod = async (req, res)=> {
     
 //Método para controlar que está auth en todas las páginas - renderizado de las páginas
 
-export const connectionSocket =  async (req,res,next)=>{
-    io.on('connection', (socket) => {
-        console.log('a user connected');
-        socket.on('disconnect', () => {
-          console.log('user disconnected');
-        });
-      });
-      next()
-}
+// export const connectionSocket =  async (req,res,next)=>{
+//     io.on('connection', (socket) => {
+//         socket.emit('conectado', req.session.name);
+//         socket.on('disconnect', () => {
+//           console.log('user disconnected');
+//         });
+//       });
+//       next()
+// }
 export const loginAuth = async (req, res, next)=> {
+        connection.query('SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, `id`, `ci_cliente`, `estatus_`, `id_cuenta`, `plan_contratado`, `direccion_contrato`, `motivo_standby`, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, `recursos_inventario_instalacion`, `observaciones_instalacion`, `contratista_asignado`, `telefono_cliente`, `nodo` FROM `contratos` WHERE contratista_asignado = ? ', [req.session.c_identidad], async (error, results, fields)=>{
 	if (req.session.loggedin) {
-        console.log(req.session.loggedin)
-		await res.render('index',{
-			login: true,
-			name: req.session.name,
-            rol: req.session.rol,
-            sexo: req.session.sexo
-		});
-	} else {
-        console.log(req.session.loggedin)
-		await res.redirect('/');				
-	}
+        if( results != undefined){
+                req.dashboard = results[0]
+                let contrat = [results]
+                console.log (req.session.c_identidad, contrat[0])
+                console.log(req.session.loggedin)
+                await res.render('index',{
+                    login: true,
+                    name: req.session.name,
+                    rol: req.session.rol,
+                    sexo: req.session.sexo,
+                    contratos: contrat
+                }
+            );
+            
+            } else {
+                console.log('no hay datos') 
+                				
+            }
+             }else{
+                console.log(req.session.loggedin)
+                await res.redirect('/');
+            }
+            
+     })
+       
 };
 export const loginAdminView = async(req, res)=> {
 	if (req.session.loggedin) {
@@ -158,6 +174,7 @@ export const loginAdminView = async(req, res)=> {
 			name: req.session.name,
             rol: req.session.rol
 		});
+        
 	} else {
         console.log(req.session.loggedin)
 		await res.render('login_admin',{
@@ -320,6 +337,11 @@ app.use(function (req,res,next){
     }
 })
 
+//Método para requerir los datos de los contratos cargados en la DB
+
+export const reqContratos = async (req,res,next)=>{
+    
+}
 
 //función para limpiar la caché luego del logout
 app.use(function (req, res, next) {
@@ -336,8 +358,4 @@ req.session.destroy(() => {
   res.redirect('/') // siempre se ejecutará después de que se destruya la sesión
 })
 };
-
-
-
-//Método para requerir los datos de los contratos cargados en la DB
 
