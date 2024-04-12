@@ -10,28 +10,6 @@ import { Server } from "socket.io";
 import { io } from "../app.js";
 
 
-
-/*export const index = (req, res, next)=>{
- res.render('index')
- next()
-
-console.log (req.session)
-}
-*/
-// export const loginView = async (req, res, next)=>{
-//    await res.render('login');
-// }
-// export const loginViewAdmin = async (req, res, next)=>{
-//    await res.render('login_admin');
-// }
-
-// export const registerUser = async(req, res, next)=>{
-//     await res.render('register_contratistas');
-// }
-
-
-// Método para registro de contratistas
-
 // Metodo de incio de sesión
 export const loginContratMethod = async (req, res)=> {
 const email = req.body.email;
@@ -128,16 +106,38 @@ export const loginAdminMethod = async (req, res)=> {
     
 //Método para controlar que está auth en todas las páginas - renderizado de las páginas
 
-// export const connectionSocket =  async (req,res,next)=>{
-//     io.on('connection', (socket) => {
-//         socket.emit('conectado', req.session.name);
-//         socket.on('disconnect', () => {
-//           console.log('user disconnected');
-//         });
-//       });
-//       next()
-// }
 export const loginAuth = async (req, res, next)=> {
+
+    if(req.session.rol){
+
+        //renderizar contratos para administradores
+        connection.query('SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, `id`, `ci_cliente`, `estatus_`, `id_cuenta`, `plan_contratado`, `direccion_contrato`, `motivo_standby`, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, `recursos_inventario_instalacion`, `observaciones_instalacion`, `contratista_asignado`, `telefono_cliente`, `nodo` FROM `contratos`', async (error, results, fields)=>{
+            if (req.session.loggedin) {
+                if( results != undefined){
+                        req.dashboard = results[0]
+                        let contrat = [results]
+                        console.log (contrat[0])
+                        console.log(req.session.loggedin)
+                        await res.render('index',{
+                            login: true,
+                            name: req.session.name,
+                            rol: req.session.rol,
+                            sexo: req.session.sexo,
+                            contratos: contrat
+                        }
+                    );
+                    } else {
+                        console.log('no hay datos') 
+                                        
+                    }
+                     }else{
+                        console.log(req.session.loggedin)
+                        await res.redirect('/');
+                    }
+                    
+             })
+    //renderizar contratos para contratistas
+    }else{
         connection.query('SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, `id`, `ci_cliente`, `estatus_`, `id_cuenta`, `plan_contratado`, `direccion_contrato`, `motivo_standby`, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, `recursos_inventario_instalacion`, `observaciones_instalacion`, `contratista_asignado`, `telefono_cliente`, `nodo` FROM `contratos` WHERE contratista_asignado = ? ', [req.session.c_identidad], async (error, results, fields)=>{
 	if (req.session.loggedin) {
         if( results != undefined){
@@ -164,7 +164,7 @@ export const loginAuth = async (req, res, next)=> {
             }
             
      })
-       
+    }    
 };
 export const loginAdminView = async(req, res)=> {
 	if (req.session.loggedin) {
@@ -219,6 +219,54 @@ export const registerUser = async(req, res)=> {
 	}
 };
 
+export const uploadContrat = async (req,res)=>{
+    if (req.session.loggedin) {
+        console.log(req.session.loggedin)
+		await res.render('uploadContrato',{
+			login: true,
+			name: req.session.name,
+            rol: req.session.rol,
+            admin_email: req.session.email
+		});
+	} else {
+        console.log(req.session.loggedin)
+		await res.render('uploadContrato',{
+            rol: false,
+			login:false,
+			name:'Debe iniciar sesión',	
+            admin_email: false	
+		});				
+	} 
+}
+
+export const updateContrat = async (req,res)=>{
+    const id_contrato = req.params.id
+    connection.query ('SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, `id`, `ci_cliente`, `estatus_`, `id_cuenta`, `plan_contratado`, `direccion_contrato`, `motivo_standby`, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, `recursos_inventario_instalacion`, `observaciones_instalacion`, `contratista_asignado`, `telefono_cliente`, `nodo` FROM `contratos` WHERE id = ? ', [id_contrato], async (error, results, fields)=>{
+        if (req.session.loggedin) {
+            if( results != undefined){
+                    let contrat = [results]
+                    console.log (req.session.c_identidad, contrat)
+                    console.log(req.session.loggedin)
+                    await res.render('updateContrato',{
+                        login: true,
+                        name: req.session.name,
+                        rol: req.session.rol,
+                        id_contrat:req.session.c_identidad,
+                        sexo: req.session.sexo,
+                        contratos: contrat,
+                    }
+                )
+                
+                } else {
+                    console.log('no hay datos') 
+                                    
+                }
+                 }else{
+                    console.log(req.session.loggedin)
+                    await res.redirect('/');
+                }
+    })
+}
 
 export const registerMethod = async (req, res)=>{
     const c_identidad = req.body.c_identidad
@@ -337,11 +385,292 @@ app.use(function (req,res,next){
     }
 })
 
-//Método para requerir los datos de los contratos cargados en la DB
+//Método para requerir los datos de los contratos individuales cargados en la DB
+export const loadContrat = async (req,res)=>{
+    const id_contrato = req.params.id
+    connection.query ('SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, `id`, `ci_cliente`, `estatus_`, `id_cuenta`, `plan_contratado`, `direccion_contrato`, `motivo_standby`, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, `recursos_inventario_instalacion`, `observaciones_instalacion`, `contratista_asignado`, `telefono_cliente`, `nodo` FROM `contratos` WHERE id = ? ', [id_contrato], async (error, results, fields)=>{
+        if (req.session.loggedin) {
+            if( results != undefined){
+                    let contrat = [results]
+                    console.log (req.session.c_identidad, contrat)
+                    console.log(req.session.loggedin)
+                    await res.render('contrato_fullview',{
+                        login: true,
+                        name: req.session.name,
+                        rol: req.session.rol,
+                        id_contrat:req.session.c_identidad,
+                        sexo: req.session.sexo,
+                        contratos: contrat,
+                    }
+                )
+                
+                } else {
+                    console.log('no hay datos') 
+                                    
+                }
+                 }else{
+                    console.log(req.session.loggedin)
+                    await res.redirect('/');
+                }
+    })
 
-export const reqContratos = async (req,res,next)=>{
-    
 }
+
+//Método para subir nuevos contratos a la DB
+
+export const uploadContratMethod = async (req,res)=>{
+
+const id  = req.body.id                                    
+const fecha_contrato  = req.body.fecha_contrato
+const estatus_  = req.body.estatus_
+const id_cuenta  = req.body. id_cuenta
+const plan_contratado  = req.body.plan_contratado
+const direccion_contrato  = req.body.direccion_contrato
+const motivo_standby  = req.body.motivo_standby
+const fecha_instalacion  = req.body.fecha_instalacion
+const recursos_inventario_instalacion  = req.body.recursos_inventario_instalacion
+const observaciones_instalacion  = req.body.observaciones_instalacion
+const contratista_asignado  = req.body.contratista_asignado
+const telefono_cliente  = req.body.telefono_cliente
+const nodo  = req.body.nodo
+     if (!(id &&fecha_contrato  &&estatus_  &&id_cuenta  &&plan_contratado  &&direccion_contrato  &&nodo )){
+         await   res.render('uploadContrato', {
+                login: true,
+                rol:true,
+                alert: true,
+                alertTitle: "Error",
+                alertMessage: "Complete todos los campos marcados con *",
+                alertIcon:'error',
+                showConfirmButton: true,
+                timer: false,
+                ruta: 'register'
+            });
+    
+        }else{
+        connection.query ('SELECT * FROM contratos WHERE id = ?', [id], async (error, results, fields)=> {
+            let resultados_array = [  '',  '',  '', '',  '',  '',  '']
+           if (results != 0){
+            resultados_array = results
+           }
+            console.log((resultados_array))
+            if (results.length != 0 || id == resultados_array[0].id) {
+                            res.render('uploadContrato', {
+                                login: true,
+                                rol:true,
+                                alert: true,
+                                alertTitle: "Error",
+                                alertMessage: "CONTRATO YA REGISTRADO",
+                                alertIcon:'error',
+                                showConfirmButton: true,
+                                timer: false,
+                                ruta: 'register'   })
+            } else {  
+                connection.query('INSERT INTO contratos SET ?',{id:id,
+                    fecha_contrato:fecha_contrato,
+                    estatus_:estatus_,
+                    id_cuenta:id_cuenta,
+                    plan_contratado:plan_contratado,
+                    direccion_contrato:direccion_contrato,
+                    motivo_standby:motivo_standby,
+                    fecha_instalacion:fecha_instalacion,
+                    recursos_inventario_instalacion:recursos_inventario_instalacion,
+                    observaciones_instalacion:observaciones_instalacion,
+                    contratista_asignado:contratista_asignado,
+                    telefono_cliente:telefono_cliente,
+                    nodo:nodo}, async (error,results) =>{ res.render('uploadContrato', {
+                    login: true,
+                    rol:true,
+                    alert: true,
+                    alertTitle: "Registration",
+                    alertMessage: "¡Successful Registration!",
+                    alertIcon:'success',
+                    showConfirmButton: false,
+                    timer: 1500,
+                    ruta: 'index'
+                });})
+                    }
+                })                 
+            }
+    }
+
+export const updateContratMethod = async (req,res)=>{
+    const id_contrato = req.params.id
+    connection.query ('SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, `id`, `ci_cliente`, `estatus_`, `id_cuenta`, `plan_contratado`, `direccion_contrato`, `motivo_standby`, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, `recursos_inventario_instalacion`, `observaciones_instalacion`, `contratista_asignado`, `telefono_cliente`, `nodo` FROM `contratos` WHERE id = ? ', [id_contrato], async (error, results, fields)=>{
+        let contrat = [results]
+   
+            
+
+    if(req.session.rol){
+    const id  = req.body.id                                    
+    const fecha_contrato  = req.body.fecha_contrato
+    const estatus_  = req.body.estatus_
+    const id_cuenta  = req.body. id_cuenta
+    const plan_contratado  = req.body.plan_contratado
+    const direccion_contrato  = req.body.direccion_contrato
+    const motivo_standby  = req.body.motivo_standby
+    const fecha_instalacion  = req.body.fecha_instalacion
+    const recursos_inventario_instalacion  = req.body.recursos_inventario_instalacion
+    const observaciones_instalacion  = req.body.observaciones_instalacion
+    const contratista_asignado  = req.body.contratista_asignado
+    const telefono_cliente  = req.body.telefono_cliente
+    const nodo  = req.body.nodo
+         if (!(id &&fecha_contrato  &&estatus_  &&id_cuenta  &&plan_contratado  &&direccion_contrato  &&nodo )){
+             await   res.render('updateContrato', {
+                    login: true,
+                    rol:req.session.rol,
+                    alert: true,
+                    id_contrat:req.session.c_identidad,
+                    contratos: contrat,
+                    alertTitle: "Error",
+                    alertMessage: "Complete todos los campos marcados con *",
+                    alertIcon:'error',
+                    showConfirmButton: true,
+                    timer: false,
+                    ruta: `update-contrato/${id_contrato}`
+                });
+        
+            }else{
+            connection.query ('SELECT id FROM contratos WHERE id != ?', [id_contrato], async (error, results, fields)=> {
+                let resultados_array = ['',  '',  '', '',  '',  '',  '']
+               if (results != 0){
+                resultados_array = results
+               }
+                console.log((resultados_array))
+                console.log(contrat)
+                if (results.length != 0 || id == resultados_array[0].id) {
+                                res.render('updateContrato', {
+                                    login: true,
+                                    rol:req.session.rol,
+                                    id_contrat:req.session.c_identidad,
+                                    contratos: contrat,
+                                    alert: true,
+                                    alertTitle: "Error",
+                                    alertMessage: "CONTRATO YA REGISTRADO",
+                                    alertIcon:'error',
+                                    showConfirmButton: true,
+                                    timer: false,
+                                    ruta: `update-contrato/${id_contrato}`  })  
+                } else {  
+                    connection.query('UPDATE contratos SET ?',{id:id,
+                        fecha_contrato:fecha_contrato,
+                        estatus_:estatus_,
+                        id_cuenta:id_cuenta,
+                        plan_contratado:plan_contratado,
+                        direccion_contrato:direccion_contrato,
+                        motivo_standby:motivo_standby,
+                        fecha_instalacion:fecha_instalacion,
+                        recursos_inventario_instalacion:recursos_inventario_instalacion,
+                        observaciones_instalacion:observaciones_instalacion,
+                        contratista_asignado:contratista_asignado,
+                        telefono_cliente:telefono_cliente,
+                        nodo:nodo}, async (error,results) =>{ res.render('updateContrato', {
+                        login: true,
+                        rol:true,
+                        alert: true,
+                        alertTitle: "Registration",
+                        alertMessage: "¡Successful Registration!",
+                        alertIcon:'success',
+                        showConfirmButton: false,
+                        timer: 1500,
+                        ruta: '/index'
+                    });})
+                        }
+                    })                 
+                }
+            }else{
+                const id  = req.body.id                                    
+    const fecha_contrato  = req.body.fecha_contrato
+    const estatus_  = req.body.estatus_
+    const id_cuenta  = req.body. id_cuenta
+    const plan_contratado  = req.body.plan_contratado
+    const direccion_contrato  = req.body.direccion_contrato
+    const motivo_standby  = req.body.motivo_standby
+    const fecha_instalacion  = req.body.fecha_instalacion
+    const recursos_inventario_instalacion  = req.body.recursos_inventario_instalacion
+    const observaciones_instalacion  = req.body.observaciones_instalacion
+    const contratista_asignado  = req.body.contratista_asignado
+    const telefono_cliente  = req.body.telefono_cliente
+    const nodo  = req.body.nodo
+         if (!(id &&fecha_contrato  &&estatus_  &&id_cuenta  &&plan_contratado  &&direccion_contrato  &&nodo )){
+             await   res.render('updateContrato', {
+                    login: true,
+                    rol:req.session.rol,
+                    alert: true,
+                    id_contrat:req.session.c_identidad,
+                    contratos: contrat,
+                    alertTitle: "Error",
+                    alertMessage: "Complete todos los campos marcados con *",
+                    alertIcon:'error',
+                    showConfirmButton: true,
+                    timer: false,
+                    ruta: `update-contrato/${id_contrato}`
+                });
+        
+            }else{
+            connection.query ('SELECT id FROM contratos WHERE id != ?', [id_contrato], async (error, results, fields)=> {
+                let resultados_array = [  '',  '',  '', '',  '',  '',  '']
+               if (results != 0){
+                resultados_array = results
+               }
+                console.log((resultados_array))
+                console.log(contrat)
+                var comp_id = false
+                for (let index = 0; index < resultados_array.length; index++) {
+                    if (id!=resultados_array[index]){
+                        comp_id = true
+                    }
+                }
+                // tenemos problemas XDD
+                console.log(comp_id)
+                if (comp_id == true) {
+                                res.render('updateContrato', {
+                                    login: true,
+                                    rol:req.session.rol,
+                                    id_contrat:req.session.c_identidad,
+                                    contratos: contrat,
+                                    alert: true,
+                                    alertTitle: "Error",
+                                    alertMessage: "CONTRATO YA REGISTRADO",
+                                    alertIcon:'error',
+                                    showConfirmButton: true,
+                                    timer: false,
+                                    ruta: `update-contrato/${id_contrato}`  })
+                } else {  
+                    connection.query('UPDATE contratos SET ?',{id:id,
+                        fecha_contrato:fecha_contrato,
+                        estatus_:estatus_,
+                        id_cuenta:id_cuenta,
+                        plan_contratado:plan_contratado,
+                        direccion_contrato:direccion_contrato,
+                        motivo_standby:motivo_standby,
+                        fecha_instalacion:fecha_instalacion,
+                        recursos_inventario_instalacion:recursos_inventario_instalacion,
+                        observaciones_instalacion:observaciones_instalacion,
+                        contratista_asignado:contratista_asignado,
+                        telefono_cliente:telefono_cliente,
+                        nodo:nodo}, async (error,results) =>{ res.render('updateContrato', {
+                        login: true,
+                        rol:true,
+                        alert: true,
+                        contratos: contrat,
+                        alertTitle: "Registration",
+                        alertMessage: "¡Successful Registration!",
+                        alertIcon:'success',
+                        showConfirmButton: false,
+                        timer: 1500,
+                        ruta: 'index'
+                    
+                        }
+                    )
+                }
+            )
+                        }
+                    })                 
+                }
+            }
+        })
+    }
+
 
 //función para limpiar la caché luego del logout
 app.use(function (req, res, next) {
