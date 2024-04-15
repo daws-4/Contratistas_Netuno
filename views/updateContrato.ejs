@@ -11,21 +11,21 @@
           <h4>EDITAR CONTRATO</h4>
           <form action="" method="POST">
           <input class="controls" type="text" name="id" placeholder="ID del Contrato*" value="<%=contratos[0][0].id %>" tabindex="1" autofocus>
-          <input class="controls" type="date" name="fecha_contrato" placeholder="Fecha del Contrato*" required tabindex="2">
-          <select class="controls" type="text" name="estatus_" placeholder="Estado de la Insstalación*" required tabindex="6" >
+          <input class="controls" type="date" name="fecha_contrato" placeholder="Fecha del Contrato*" value="<%=contratos[0][0].fecha_contrato %>" required tabindex="2">
+          <select class="controls" type="text" name="estatus_" placeholder="Estado de la Instalación*" value="<%=contratos[0][0].estatus_ %>" required tabindex="6" >
             <option value="0">Agendado</option>
             <option value="1">Emitido</option>
           <input class="controls" type="text" name="ci_cliente" placeholder="CI del cliente*" value="<%=contratos[0][0].ci_cliente %>" required tabindex="4" maxlength="30">
-          <input class="controls" type="text" name="id_cuenta" placeholder="ID Cuenta del Cliente*" required tabindex="4" maxlength="30">
-          <input class="controls" type="text" name="plan_contratado" placeholder="Plan Contratado*" required tabindex="5" maxlength="30">
-          <input class="controls" type="text" name="direccion_contrato" placeholder="Dirección del Contrato*" required tabindex="7" >
-          <input class="controls" type="text" name="motivo_standby" placeholder="Motivo de Pausa" tabindex="8" >
-          <input class="controls" type="date" name="fecha_instalacion" placeholder="Fecha de Instalación" tabindex="9" >
-          <input class="controls" type="text" name="recursos_inventario_instalacion" placeholder="Recursos Utilizados" tabindex="10" >
-          <input class="controls" type="text" name="observaciones_instalacion" placeholder="Observaciones" tabindex="11" >
-          <input class="controls" type="text" name="contratista_asignado" placeholder="Contratista Asignado" tabindex="12" >
-          <input class="controls" type="text" name="telefono_cliente" placeholder="Teléfono del Cliente" tabindex="13"minlength='11' maxlength="11">
-          <input class="controls" type="text" name="nodo" placeholder="Nodo*" required tabindex="14" >
+          <input class="controls" type="text" name="id_cuenta" placeholder="ID Cuenta del Cliente*" value="<%=contratos[0][0].id_cuenta %>" required tabindex="4" maxlength="30">
+          <input class="controls" type="text" name="plan_contratado" placeholder="Plan Contratado*" value="<%=contratos[0][0].plan_contratado %>" required tabindex="5" maxlength="30">
+          <input class="controls" type="text" name="direccion_contrato" placeholder="Dirección del Contrato*" value="<%=contratos[0][0].direccion_contrato %>" required tabindex="7" >
+          <input class="controls" type="text" name="motivo_standby" placeholder="Motivo de Pausa" value="<%=contratos[0][0].motivo_standby %>" tabindex="8" >
+          <input class="controls" type="date" name="fecha_instalacion" placeholder="Fecha de Instalación" value="<%=contratos[0][0].fecha_instalacion %>" tabindex="9" >
+          <input class="controls" type="text" name="recursos_inventario_instalacion" placeholder="Recursos Utilizados" value="<%=contratos[0][0].recursos_inventario_instalacion %>" tabindex="10" >
+          <input class="controls" type="text" name="observaciones_instalacion" placeholder="Observaciones" value="<%=contratos[0][0].observaciones_instalacion %>" tabindex="11" >
+          <input class="controls" type="text" name="contratista_asignado" placeholder="Contratista Asignado" value="<%=contratos[0][0].contratista_asignado %>" tabindex="12" >
+          <input class="controls" type="text" name="telefono_cliente" placeholder="Teléfono del Cliente" value="<%=contratos[0][0].telefono_cliente %>" tabindex="13"minlength='11' maxlength="11">
+          <input class="controls" type="text" name="nodo" placeholder="Nodo*" value="<%=contratos[0][0].nodo %>" required tabindex="14" >
           <input class="botons" type="submit" value="Registrar">
             <label for=""></label>
   

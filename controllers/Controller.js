@@ -124,6 +124,7 @@ export const loginAuth = async (req, res, next)=> {
                             rol: req.session.rol,
                             sexo: req.session.sexo,
                             contratos: contrat
+
                         }
                     );
                     } else {
@@ -493,6 +494,7 @@ const nodo  = req.body.nodo
             }
     }
 
+    //Método para actualizar contratos en la DB
 export const updateContratMethod = async (req,res)=>{
     const id_contrato = req.params.id
     connection.query ('SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, `id`, `ci_cliente`, `estatus_`, `id_cuenta`, `plan_contratado`, `direccion_contrato`, `motivo_standby`, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, `recursos_inventario_instalacion`, `observaciones_instalacion`, `contratista_asignado`, `telefono_cliente`, `nodo` FROM `contratos` WHERE id = ? ', [id_contrato], async (error, results, fields)=>{
@@ -504,7 +506,8 @@ export const updateContratMethod = async (req,res)=>{
     const id  = req.body.id                                    
     const fecha_contrato  = req.body.fecha_contrato
     const estatus_  = req.body.estatus_
-    const id_cuenta  = req.body. id_cuenta
+    const id_cuenta  = req.body.id_cuenta
+    const ci_cliente = req.body.ci_cliente
     const plan_contratado  = req.body.plan_contratado
     const direccion_contrato  = req.body.direccion_contrato
     const motivo_standby  = req.body.motivo_standby
@@ -530,14 +533,34 @@ export const updateContratMethod = async (req,res)=>{
                 });
         
             }else{
-            connection.query ('SELECT id FROM contratos WHERE id != ?', [id_contrato], async (error, results, fields)=> {
-                let resultados_array = ['',  '',  '', '',  '',  '',  '']
-               if (results != 0){
-                resultados_array = results
-               }
-                console.log((resultados_array))
-                console.log(contrat)
-                if (results.length != 0 || id == resultados_array[0].id) {
+                connection.query ('SELECT id FROM contratos WHERE id != ?', [id_contrato], async (error, results, fields)=> {
+                    let resultados_array = [  '',  '',  '', '',  '',  '',  '']
+                   if (results != 0){
+                    resultados_array = results
+                   }
+                    console.log((resultados_array[0]))
+                    console.log(contrat)
+                    let comp_id = false
+                    let encontrado = false
+                    for (let index = 0; index < resultados_array.length; index++) {
+                        if (id==resultados_array[index].id){
+                            encontrado = true
+                           
+                            break
+                        }
+                    }
+                    if (encontrado){
+                        comp_id = true
+                        console.log('id es igual a compid')
+                    } else{
+                        comp_id = false
+                        console.log('id NO es igual a compid')
+                    }
+                    // tenemos problemas XDD
+    
+                    //resuelto uwu
+                    console.log(comp_id, id)
+                if (comp_id) {
                                 res.render('updateContrato', {
                                     login: true,
                                     rol:req.session.rol,
@@ -551,19 +574,20 @@ export const updateContratMethod = async (req,res)=>{
                                     timer: false,
                                     ruta: `update-contrato/${id_contrato}`  })  
                 } else {  
-                    connection.query('UPDATE contratos SET ?',{id:id,
-                        fecha_contrato:fecha_contrato,
-                        estatus_:estatus_,
-                        id_cuenta:id_cuenta,
-                        plan_contratado:plan_contratado,
-                        direccion_contrato:direccion_contrato,
-                        motivo_standby:motivo_standby,
-                        fecha_instalacion:fecha_instalacion,
-                        recursos_inventario_instalacion:recursos_inventario_instalacion,
-                        observaciones_instalacion:observaciones_instalacion,
-                        contratista_asignado:contratista_asignado,
-                        telefono_cliente:telefono_cliente,
-                        nodo:nodo}, async (error,results) =>{ res.render('updateContrato', {
+                    connection.query(`UPDATE contratos SET id='${id}',
+                    fecha_contrato='${fecha_contrato}',
+                    estatus_='${estatus_}',
+                    ci_cliente= '${ci_cliente}',
+                    id_cuenta='${id_cuenta}',
+                    plan_contratado='${plan_contratado}',
+                    direccion_contrato='${direccion_contrato}',
+                    motivo_standby='${motivo_standby}',
+                    fecha_instalacion='${fecha_instalacion}',
+                    recursos_inventario_instalacion='${recursos_inventario_instalacion}',
+                    observaciones_instalacion='${observaciones_instalacion}',
+                    telefono_cliente='${telefono_cliente}',
+                    contratista_asignado='${contratista_asignado}'
+                    nodo='${nodo}' WHERE id = '${id_contrato}'` , async (error,results) =>{ res.render('updateContrato', {
                         login: true,
                         rol:true,
                         alert: true,
@@ -581,6 +605,7 @@ export const updateContratMethod = async (req,res)=>{
                 const id  = req.body.id                                    
     const fecha_contrato  = req.body.fecha_contrato
     const estatus_  = req.body.estatus_
+    const ci_cliente = req.body.ci_cliente
     const id_cuenta  = req.body. id_cuenta
     const plan_contratado  = req.body.plan_contratado
     const direccion_contrato  = req.body.direccion_contrato
@@ -588,7 +613,6 @@ export const updateContratMethod = async (req,res)=>{
     const fecha_instalacion  = req.body.fecha_instalacion
     const recursos_inventario_instalacion  = req.body.recursos_inventario_instalacion
     const observaciones_instalacion  = req.body.observaciones_instalacion
-    const contratista_asignado  = req.body.contratista_asignado
     const telefono_cliente  = req.body.telefono_cliente
     const nodo  = req.body.nodo
          if (!(id &&fecha_contrato  &&estatus_  &&id_cuenta  &&plan_contratado  &&direccion_contrato  &&nodo )){
@@ -614,15 +638,27 @@ export const updateContratMethod = async (req,res)=>{
                }
                 console.log((resultados_array))
                 console.log(contrat)
-                var comp_id = false
+                let comp_id = false
+                let encontrado = false
                 for (let index = 0; index < resultados_array.length; index++) {
-                    if (id!=resultados_array[index]){
-                        comp_id = true
+                    if (id==resultados_array[index].id){
+                        encontrado = true
+                       
+                        break
                     }
                 }
+                if (encontrado){
+                    comp_id = true
+                    console.log('id es igual a compid')
+                } else{
+                    comp_id = false
+                    console.log('id NO es igual a compid')
+                }
                 // tenemos problemas XDD
-                console.log(comp_id)
-                if (comp_id == true) {
+
+                //resuelto uwu
+                console.log(comp_id, id)
+                if (comp_id) {
                                 res.render('updateContrato', {
                                     login: true,
                                     rol:req.session.rol,
@@ -636,25 +672,25 @@ export const updateContratMethod = async (req,res)=>{
                                     timer: false,
                                     ruta: `update-contrato/${id_contrato}`  })
                 } else {  
-                    connection.query('UPDATE contratos SET ?',{id:id,
-                        fecha_contrato:fecha_contrato,
-                        estatus_:estatus_,
-                        id_cuenta:id_cuenta,
-                        plan_contratado:plan_contratado,
-                        direccion_contrato:direccion_contrato,
-                        motivo_standby:motivo_standby,
-                        fecha_instalacion:fecha_instalacion,
-                        recursos_inventario_instalacion:recursos_inventario_instalacion,
-                        observaciones_instalacion:observaciones_instalacion,
-                        contratista_asignado:contratista_asignado,
-                        telefono_cliente:telefono_cliente,
-                        nodo:nodo}, async (error,results) =>{ res.render('updateContrato', {
+                    connection.query(`UPDATE contratos SET id='${id}',
+                        fecha_contrato='${fecha_contrato}',
+                        estatus_='${estatus_}',
+                        ci_cliente= '${ci_cliente}',
+                        id_cuenta='${id_cuenta}',
+                        plan_contratado='${plan_contratado}',
+                        direccion_contrato='${direccion_contrato}',
+                        motivo_standby='${motivo_standby}',
+                        fecha_instalacion='${fecha_instalacion}',
+                        recursos_inventario_instalacion='${recursos_inventario_instalacion}',
+                        observaciones_instalacion='${observaciones_instalacion}',
+                        telefono_cliente='${telefono_cliente}',
+                        nodo='${nodo}' WHERE id = '${id_contrato}'` ,async (error,results, fields) =>{ res.render('updateContrato', {
                         login: true,
                         rol:true,
                         alert: true,
                         contratos: contrat,
                         alertTitle: "Registration",
-                        alertMessage: "¡Successful Registration!",
+                        alertMessage: "¡Actualización Correcta!",
                         alertIcon:'success',
                         showConfirmButton: false,
                         timer: 1500,
@@ -662,6 +698,7 @@ export const updateContratMethod = async (req,res)=>{
                     
                         }
                     )
+                    if (error){console.log(error)} else {console.log(results)}
                 }
             )
                         }
