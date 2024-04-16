@@ -69,7 +69,15 @@
           </div>
           <div class="contrat-status text center">
             <form class="boton-update" action="/update-contrato/<%=contratos[0][0].id%>" method="GET">
-                <a class="botons" href="/update-contrato/<%=contratos[0][0].id%>"> EDITAR</a>
+                <a class="botons-green" href="/update-contrato/<%=contratos[0][0].id%>"> EDITAR</a>
+                <a class="botons-red" href="/delete-contrato/<%=contratos[0][0].id%>" onclick="miAlerta()"> ELIMINAR</a>
+                <script>
+                    function miAlerta(evento) {
+                        const confirmDelete = window.confirm("¿Estás seguro que deseas eliminar este registro?")
+                        if (!(confirmDelete)){
+                            event.preventDefault();
+                        }}
+                </script>
             </form>
         </div>
                 <% } %>
@@ -160,7 +168,7 @@
               <% if(id_contrat == contratos[0][0].contratista_asignado) {%>
                 <div class="contrat-status text center">
                     <form class="boton-update" action="/update-contrato/<%=contratos[0][0].id%>" method="GET">
-                        <a class="botons" href="/update-contrato/<%=contratos[0][0].id%>"> EDITAR</a>
+                        <a class="botons-green" href="/update-contrato/<%=contratos[0][0].id%>"> EDITAR</a>
                     </form>
                 </div>
                 <% }else{ %>
@@ -238,6 +246,20 @@
     <script src="contratistas-styles/js/smooth-scroll.min.js"></script>
     <script src="contratistas-styles/js/sitio.js"></script>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+    <script src="/styles/sweetalert210.js"></script>
+    <% if (typeof alert != "undefined")  { %>
+      <script>
+      Swal.fire({
+        title:'<%= alertTitle %>',
+        text:'<%= alertMessage %>',
+        icon:'<%= alertIcon %>',
+        showConfirmButton: <%= showConfirmButton %>,
+        timer: <%= timer %>
+        }).then(()=>{
+        window.location='/<%= ruta %>'
+        })
+        </script>
+        <% } %>
     <script type="text/javascript">
         const socket = io()
     </script>
