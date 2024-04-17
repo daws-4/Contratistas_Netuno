@@ -692,18 +692,24 @@ export const updateContratMethod = async (req,res)=>{
                     recursos_inventario_instalacion='${recursos_inventario_instalacion}',
                     observaciones_instalacion='${observaciones_instalacion}',
                     telefono_cliente='${telefono_cliente}',
-                    contratista_asignado='${contratista_asignado}'
-                    nodo='${nodo}' WHERE id = '${id_contrato}'` , async (error,results) =>{ res.render('updateContrato', {
+                    contratista_asignado='${contratista_asignado}',
+                    nodo='${nodo}' WHERE id = '${id_contrato}'` , async (error,results) =>{ 
+                        if (error){
+                            console.log(error)
+                        }else{
+                        
+                        res.render('updateContrato', {
                         login: true,
                         rol:true,
                         alert: true,
+                        contratos:contrat,
                         alertTitle: "Registration",
                         alertMessage: "¡Successful Registration!",
                         alertIcon:'success',
                         showConfirmButton: false,
                         timer: 1500,
-                        ruta: '/index'
-                    });})
+                        ruta: 'index'
+                    });}})
                         }
                     })                 
                 }
@@ -829,7 +835,7 @@ export const deleteContrat = async (req,res) =>{
         }
     
     }
-//PENDIENTE
+//Método para actualizar datos de los contratistas
 export const updateContratistaMethod = async (req,res)=>{
         const id_contratista = req.params.id
         connection.query ('SELECT * FROM contratistas WHERE C_Identidad = ? ', [id_contratista], async (error, results, fields)=>{
@@ -930,7 +936,6 @@ export const updateContratistaMethod = async (req,res)=>{
                             email='${email}',
                             n_telefono='${n_telefono}',
                             sexo='${sexo}',
-                            contraseña='${passwordHash}',
                             Nombres='${Nombres}',
                             Apellidos='${Apellidos}',
                             empresa_contratista='${empresa_contratista}'
@@ -966,11 +971,13 @@ export const updateContratistaMethod = async (req,res)=>{
                             ruta: `update-contratista/${id_contratista}` 
                         })
                     }else{
+                        let passwordHash = await bcrypt.hash(pass, 8);
                         connection.query(`UPDATE contratistas SET
                         C_Identidad='${C_Identidad}',
                         email='${email}',
                         n_telefono='${n_telefono}',
                         sexo='${sexo}',
+                        contraseña='${passwordHash}',
                         Nombres='${Nombres}',
                         Apellidos='${Apellidos}'
                         WHERE C_identidad = '${id_contratista}'` , async (error,results) =>{

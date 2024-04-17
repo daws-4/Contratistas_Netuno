@@ -8,7 +8,7 @@ import { Server }from "socket.io"
 import session from 'express-session'
 import router from "./routes/routes.js"; 
 
-const IP = '192.168.1.110'
+const IP = '172.16.0.197'
 
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
