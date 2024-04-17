@@ -19,7 +19,7 @@
            <% } %>
         </div>
         <div class="contratos_firstview">
-            <h6 id="welcomers"> CONTRATOS</h6>
+            <h6 id="welcomers"> CONTRATOS </h6>
             <table id="lista-contratos" class="principal-table table-striped">
                 <thead> 
                     <tr>
@@ -80,7 +80,7 @@
               <% } %>
               </div>
               <div class="contratos_firstview">
-                <h6 id="welcomers"> CONTRATOS</h6>
+                <h6 id="welcomers"> CONTRATOS <% if (estatus == 1) {%> PENDIENTES <% }else if(estatus == 2){%> EMITIDOS <% }else{ %>  <% } %></h6>
                 <table id="lista-contratos" class="principal-table table-striped">
                     <thead> 
                         <tr>

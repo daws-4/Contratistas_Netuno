@@ -19,6 +19,8 @@ import {
     deleteContratista,
     updateContratista,
     updateContratistaMethod,
+    contratosPendientes,
+    contratosEmitidos,
 } from '../controllers/Controller.js'
 const router = Router();
 
@@ -41,6 +43,8 @@ router.get('/contratista/:id', loadContratista)
 router.get('/update-contratista/:id', updateContratista)
 router.post('/update-contratista/:id', updateContratistaMethod)
 router.get('/delete-contratista/:id', deleteContratista)
+router.get('/contratos-pendientes', contratosPendientes)
+router.get ('/archivo-de-contratos', contratosEmitidos)
 
 
 export default router;

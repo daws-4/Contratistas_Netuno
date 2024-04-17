@@ -119,6 +119,7 @@ export const loginAuth = async (req, res, next)=> {
                         console.log (contrat[0])
                         console.log(req.session.loggedin)
                         await res.render('index',{
+                            estatus: false,
                             login: true,
                             name: req.session.name,
                             rol: req.session.rol,
@@ -147,6 +148,7 @@ export const loginAuth = async (req, res, next)=> {
                 console.log (req.session.c_identidad, contrat[0])
                 console.log(req.session.loggedin)
                 await res.render('index',{
+                    estatus: false,
                     login: true,
                     name: req.session.name,
                     rol: req.session.rol,
@@ -180,6 +182,7 @@ export const loginEditContratistaAuth = async (req, res, next)=> {
                         console.log (contrat[0])
                         console.log(req.session.loggedin)
                         await res.render('contratistas_listview',{
+                            estatus_: '',
                             login: true,
                             name: req.session.name,
                             rol: req.session.rol,
@@ -207,6 +210,78 @@ export const loginEditContratistaAuth = async (req, res, next)=> {
      
     }    
 };
+
+export const contratosPendientes = async (req,res)=> {
+    if (req.session.rol){
+        await res.redirect('/index');
+    }else{
+        const uno = 1
+        const dos = 2
+    connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo FROM contratos WHERE (contratista_asignado =${req.session.c_identidad}) AND (estatus_ != 1) `,  async (error, results, fields)=>{
+        if (req.session.loggedin) {
+            if( results != undefined){
+                    req.dashboard = results[0]
+                    let contrat = [results]
+                    console.log (req.session.c_identidad, contrat[0])
+                    console.log(req.session.loggedin)
+                    await res.render('index',{
+                        estatus: uno,
+                        login: true,
+                        name: req.session.name,
+                        rol: req.session.rol,
+                        sexo: req.session.sexo,
+                        contratos: contrat
+                    }
+                );
+                
+                } else {
+                    console.log('no hay datos') 
+                                    
+                }
+                 }else{
+                    console.log(req.session.loggedin)
+                    await res.redirect('/');
+                }
+                
+         })
+}
+}
+
+export const contratosEmitidos = async (req,res)=> {
+    if (req.session.rol){
+        await res.redirect('/index');
+    }else{
+        const uno = 1
+        const dos = 2
+    connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo FROM contratos WHERE (contratista_asignado =${req.session.c_identidad}) AND (estatus_ != 0) `,  async (error, results, fields)=>{
+        if (req.session.loggedin) {
+            if( results != undefined){
+                    req.dashboard = results[0]
+                    let contrat = [results]
+                    console.log (req.session.c_identidad, contrat[0])
+                    console.log(req.session.loggedin)
+                    await res.render('index',{
+                        estatus: dos,
+                        login: true,
+                        name: req.session.name,
+                        rol: req.session.rol,
+                        sexo: req.session.sexo,
+                        contratos: contrat
+                    }
+                );
+                
+                } else {
+                    console.log('no hay datos') 
+                                    
+                }
+                 }else{
+                    console.log(req.session.loggedin)
+                    await res.redirect('/');
+                }
+                
+         })
+}
+}
 
 //Métodos para controlar que está auth en todas las páginas - renderizado de las páginas
 export const loginAdminView = async(req, res)=> {
@@ -532,7 +607,8 @@ export const uploadContratMethod = async (req,res)=>{
 const id  = req.body.id                                    
 const fecha_contrato  = req.body.fecha_contrato
 const estatus_  = req.body.estatus_
-const id_cuenta  = req.body. id_cuenta
+const id_cuenta  = req.body.id_cuenta
+const ci_cliente = req.body.ci_cliente
 const plan_contratado  = req.body.plan_contratado
 const direccion_contrato  = req.body.direccion_contrato
 const motivo_standby  = req.body.motivo_standby
@@ -542,7 +618,7 @@ const observaciones_instalacion  = req.body.observaciones_instalacion
 const contratista_asignado  = req.body.contratista_asignado
 const telefono_cliente  = req.body.telefono_cliente
 const nodo  = req.body.nodo
-     if (!(id &&fecha_contrato  &&estatus_  &&id_cuenta  &&plan_contratado  &&direccion_contrato  &&nodo )){
+     if (!(id &&fecha_contrato&& ci_cliente  &&estatus_  &&id_cuenta  &&plan_contratado  &&direccion_contrato  &&nodo )){
          await   res.render('uploadContrato', {
                 login: true,
                 rol:true,
@@ -578,6 +654,7 @@ const nodo  = req.body.nodo
                     fecha_contrato:fecha_contrato,
                     estatus_:estatus_,
                     id_cuenta:id_cuenta,
+                    ci_cliente:ci_cliente,
                     plan_contratado:plan_contratado,
                     direccion_contrato:direccion_contrato,
                     motivo_standby:motivo_standby,
