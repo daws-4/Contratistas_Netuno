@@ -1,7 +1,8 @@
 <%- include("partials/_head") %>
         <link rel="stylesheet" href="/styles/register.css">
       </head>
-      <% if (rol && login) { %>
+      <% if (rol == 2 && login) { %>
+
         <%- include("partials/_header_logged_admin") %>
 
       </div>
@@ -43,6 +44,56 @@
    })
    </script>
   <% } %>
+  <% }else if( login && rol == 1){ %>
+    <% if (empresa_contratista == contratos[0][0].empresa_contratista){ %>
+      <%- include("partials/_header_logged_admin") %>
+
+    </div>
+    <body>
+      <section class="form-register">
+        <h4>EDITAR CONTRATISTA <%=contratos[0][0].C_Identidad%></h4>
+        <form action="" method="POST">
+        <input class="controls" type="email" name="email" placeholder="email" value="<%=contratos[0][0].email %>" required tabindex="1" autofocus>
+        <input class="controls" type="text" name="n_telefono" placeholder="Número de Telefóno" value="<%=contratos[0][0].n_telefono %>" required tabindex="2" maxlength="11">
+        <input class="controls" type="text" name="C_Identidad" placeholder="Cédula de Identidad" value="<%=contratos[0][0].C_Identidad %>" required tabindex="3" maxlength="8">
+        <input class="controls" type="password" name="pass" placeholder="Contraseña"  tabindex="4" minlength="8" maxlength="30">
+        <input class="controls" type="password" name="confirm_pass" placeholder="Confirmar_Contraseña"  tabindex="5" minlength="8" maxlength="30">
+        <select class="controls" type="text" name="sexo" placeholder="Seleccione Género" required tabindex="6" >
+          <option value="0">Masculino</option>
+          <option value="1">Femenino</option>
+        <input class="controls" type="text" name="Nombres" placeholder="Nombres" value="<%=contratos[0][0].Nombres %>" required tabindex="7" >
+        <input class="controls" type="text" name="Apellidos" placeholder="Apellidos" value="<%=contratos[0][0].Apellidos %>" required tabindex="8" >
+        <input class="botons" type="submit" value="Registrar">
+          <label for=""></label>
+
+        </form>
+
+      </section>
+      <script src="/styles/sweetalert210.js"></script>
+
+          <% if (typeof alert != "undefined")  { %>
+            <script>
+            Swal.fire({
+   title:'<%= alertTitle %>',
+   text:'<%= alertMessage %>',
+   icon:'<%= alertIcon %>',
+   showConfirmButton: <%= showConfirmButton %>,
+   timer: <%= timer %>
+ }).then(()=>{
+   window.location='/<%= ruta %>'
+ })
+ </script>
+<% } %>
+      <% }else{ %>
+        <%- include("partials/_header_logged_admin") %>
+
+     </div>
+     <body>
+      <section class="form-register">
+        <h4>USTED NO TIENE PERMISOS PARA ACCEDER A ESTA PÁGINA</h4>
+        <a href="/index">volver al inicio</a>
+      </section>
+        <% } %>
       <% }else{ %>
         <body>
           <section class="form-register">

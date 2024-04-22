@@ -1,6 +1,6 @@
 <%- include("partials/_head") %>
     <% if (login) {%>
-<!--Menu superior ADMINISTRADORES--> <% if (rol) {%>
+<!--Menu superior ADMINISTRADORES--> <% if (rol == 2) {%>
 </head>
 <body>
     
@@ -27,6 +27,7 @@
                         <th>Nombres </th>
                         <th>Apellidos</th>
                         <th>Contratos Pendientes</th>
+                        <th>Empresa Contratista</th>
                     </tr>
                 </thead>
                 <% if (contratistas[0] != undefined) {%>
@@ -37,6 +38,7 @@
                         <td><a href="/contratista/<%=contratistas[0][index].C_Identidad %>"><%=contratistas[0][index].Nombres %></a></td>
                         <td><a href="/contratista/<%=contratistas[0][index].C_Identidad %>"><%=contratistas[0][index].Apellidos %></a></td>
                         <td><a href="/contratista/<%=contratistas[0][index].C_Identidad %>"><%=contratistas[0][index].contratos_pendientes %></a></td>
+                        <td><a href="/contratista/<%=contratistas[0][index].C_Identidad %>"><%=contratistas[0][index].empresa_contratista %></a></td>
                     </tr> 
                 <% } %>
                 </tbody>
@@ -56,6 +58,66 @@
 
 
     </section>
+
+        <% }else if (rol == 1){ %>
+        </head>
+        <body>
+            
+            <section class="bienvenidos">
+                <%- include("partials/_header_logged_admin") %>
+        
+                <div class="welcomers text-center">
+                    <% if (sexo) { %>
+                   
+                        <h5 id="welcomers" class=" wow bounceIn">Bienvenida </h5> <h5 class="nombre_contrat wow bounceIn"> <%=name %> </h5>
+        
+                    <% }else{ %>
+        
+                        <h5 id="welcomers" class=" wow bounceIn">Bienvenido </h5> <h5 class="nombre_contrat wow bounceIn"> <%=name %> </h5>
+        
+                   <% } %>
+                </div>
+                <div class="contratos_firstview">
+                    <h6 id="welcomers"> CONTRATOS</h6>
+                    <table id="lista-contratos" class="principal-table table-striped">
+                        <thead> 
+                            <tr>
+                                <th>Cédula</th>
+                                <th>Nombres </th>
+                                <th>Apellidos</th>
+                                <th>Contratos Pendientes</th>
+                            </tr>
+                        </thead>
+                        <% if (contratistas[0] != undefined) {%>
+                        <tbody>
+                        <% for (let index = 0; index < contratistas[0].length; index++) { %>
+                            <tr >
+                                <td><a href="/contratista/<%=contratistas[0][index].C_Identidad %>"><%=contratistas[0][index].C_Identidad %></a></td>
+                                <td><a href="/contratista/<%=contratistas[0][index].C_Identidad %>"><%=contratistas[0][index].Nombres %></a></td>
+                                <td><a href="/contratista/<%=contratistas[0][index].C_Identidad %>"><%=contratistas[0][index].Apellidos %></a></td>
+                                <td><a href="/contratista/<%=contratistas[0][index].C_Identidad %>"><%=contratistas[0][index].contratos_pendientes %></a></td>
+                            </tr> 
+                        <% } %>
+                        </tbody>
+                    </table>
+                  </div>
+                <% }else{ %>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr> 
+                <% } %>
+                </tbody>
+            </table>
+          </div>
+        
+        
+            </section> 
+
+
+            
  <!--Menu superior CONTRATISTAS--><% }else{ %>
         <!-- vista del contratista -->
 

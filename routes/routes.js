@@ -1,4 +1,9 @@
 import { Router } from "express";
+import express from "express";
+import { fileURLToPath } from "url";
+import multer from "multer";
+import { dirname, join,extname } from "path";
+
 import {
     loginContratMethod,
     logout,
@@ -21,6 +26,8 @@ import {
     updateContratistaMethod,
     contratosPendientes,
     contratosEmitidos,
+    uploadContratMethodXML,
+    jsonrender
 } from '../controllers/Controller.js'
 const router = Router();
 
@@ -45,6 +52,7 @@ router.post('/update-contratista/:id', updateContratistaMethod)
 router.get('/delete-contratista/:id', deleteContratista)
 router.get('/contratos-pendientes', contratosPendientes)
 router.get ('/archivo-de-contratos', contratosEmitidos)
+router.post ('/upload-contrato/json', uploadContratMethodXML,  jsonrender )
 
 
 export default router;
