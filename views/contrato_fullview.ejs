@@ -36,6 +36,7 @@
                         <th>Recursos Usados</th>
                         <th>Observaciones</th>
                         <th>Contratista Asignado</th>
+                        <th>Empresa Contratista</th>
                         <th>Teléfono del Cliente</th>
                         <th>Nodo</th>
                     </tr>
@@ -61,6 +62,13 @@
                         <td><%=contratos[0][index].recursos_inventario_instalacion %></td>
                         <td><%=contratos[0][index].observaciones_instalacion %></td>
                         <td><%=contratos[0][index].contratista_asignado %></td>
+                        <td>
+                            <%if(contratos[0][index].empresa_contratista){%>
+                            Servitel
+                            <% }else{ %>
+                            Hetelca
+                            <% } %>
+                            </td>
                         <td><%=contratos[0][index].telefono_cliente %></td>
                         <td><%=contratos[0][index].nodo %></td>
                     </tr> 
@@ -351,9 +359,9 @@
             });
         });
     </script>
-    <script src="contratistas-styles/js/wow.min.js"></script>
-    <script src="contratistas-styles/js/smooth-scroll.min.js"></script>
-    <script src="contratistas-styles/js/sitio.js"></script>
+    <script src="/contratistas-styles/js/wow.min.js"></script>
+    <script src="/contratistas-styles/js/smooth-scroll.min.js"></script>
+    <script src="/contratistas-styles/js/sitio.js"></script>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script src="/styles/sweetalert210.js"></script>
     <% if (typeof alert != "undefined")  { %>

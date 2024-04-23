@@ -38,7 +38,15 @@
                         <td><a href="/contratista/<%=contratistas[0][index].C_Identidad %>"><%=contratistas[0][index].Nombres %></a></td>
                         <td><a href="/contratista/<%=contratistas[0][index].C_Identidad %>"><%=contratistas[0][index].Apellidos %></a></td>
                         <td><a href="/contratista/<%=contratistas[0][index].C_Identidad %>"><%=contratistas[0][index].contratos_pendientes %></a></td>
-                        <td><a href="/contratista/<%=contratistas[0][index].C_Identidad %>"><%=contratistas[0][index].empresa_contratista %></a></td>
+                        <td><a href="/contratista/<%=contratistas[0][index].C_Identidad %>">
+                            
+                            <%if (contratistas[0][index].empresa_contratista) {%>
+                                Servitel
+                                <% }else{ %>
+                                Hetelca
+                                <% } %>
+                        
+                        </a></td>
                     </tr> 
                 <% } %>
                 </tbody>
@@ -187,9 +195,9 @@
             });
         });
     </script>
-    <script src="contratistas-styles/js/wow.min.js"></script>
-    <script src="contratistas-styles/js/smooth-scroll.min.js"></script>
-    <script src="contratistas-styles/js/sitio.js"></script>
+    <script src="/contratistas-styles/js/wow.min.js"></script>
+    <script src="/contratistas-styles/js/smooth-scroll.min.js"></script>
+    <script src="/contratistas-styles/js/sitio.js"></script>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script type="text/javascript">
         const socket = io()

@@ -807,7 +807,7 @@ export const updateContratMethod = async (req,res)=>{
     connection.query ('SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, `id`, `ci_cliente`, `estatus_`, `id_cuenta`, `plan_contratado`, `direccion_contrato`, `motivo_standby`, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, `recursos_inventario_instalacion`, `observaciones_instalacion`, `contratista_asignado`, `telefono_cliente`, `nodo`, `empresa_contratista` FROM `contratos` WHERE id = ? ', [id_contrato], async (error, results, fields)=>{
         let contrat = [results]
 
-    if(req.session.rol){
+    if(req.session.rol == 2){
     const id  = req.body.id                                    
     const fecha_contrato  = req.body.fecha_contrato
     const estatus_  = req.body.estatus_
@@ -820,6 +820,7 @@ export const updateContratMethod = async (req,res)=>{
     const recursos_inventario_instalacion  = req.body.recursos_inventario_instalacion
     const observaciones_instalacion  = req.body.observaciones_instalacion
     const contratista_asignado  = req.body.contratista_asignado
+    const empresa_contratista = req.body.empresa_contratista
     const telefono_cliente  = req.body.telefono_cliente
     const nodo  = req.body.nodo
          if (!(id &&fecha_contrato  &&estatus_  &&id_cuenta  &&plan_contratado  &&direccion_contrato  &&nodo )){
@@ -829,6 +830,7 @@ export const updateContratMethod = async (req,res)=>{
                     alert: true,
                     id_contrat:req.session.c_identidad,
                     contratos: contrat,
+                    empresa_contratista:req.session.empresa_contratista,
                     alertTitle: "Error",
                     alertMessage: "Complete todos los campos marcados con *",
                     alertIcon:'error',
@@ -871,6 +873,7 @@ export const updateContratMethod = async (req,res)=>{
                                     rol:req.session.rol,
                                     id_contrat:req.session.c_identidad,
                                     contratos: contrat,
+                                    empresa_contratista:req.session.empresa_contratista,
                                     alert: true,
                                     alertTitle: "Error",
                                     alertMessage: "CONTRATO YA REGISTRADO",
@@ -892,6 +895,7 @@ export const updateContratMethod = async (req,res)=>{
                     observaciones_instalacion='${observaciones_instalacion}',
                     telefono_cliente='${telefono_cliente}',
                     contratista_asignado='${contratista_asignado}',
+                    empresa_contratista = '${empresa_contratista}',
                     nodo='${nodo}' WHERE id = '${id_contrato}'` , async (error,results) =>{ 
                         if (error){
                             console.log(error)
@@ -899,9 +903,10 @@ export const updateContratMethod = async (req,res)=>{
                         
                         res.render('updateContrato', {
                         login: true,
-                        rol:true,
+                        rol:req.session.rol,
                         alert: true,
                         contratos:contrat,
+                        empresa_contratista:req.session.empresa_contratista,
                         alertTitle: "Registration",
                         alertMessage: "¡Successful Registration!",
                         alertIcon:'success',
@@ -912,6 +917,115 @@ export const updateContratMethod = async (req,res)=>{
                         }
                     })                 
                 }
+
+            }else if (req.session.rol == 1){
+                const id  = req.body.id                                    
+                const fecha_contrato  = req.body.fecha_contrato
+                const estatus_  = req.body.estatus_
+                const ci_cliente = req.body.ci_cliente
+                const id_cuenta  = req.body. id_cuenta
+                const plan_contratado  = req.body.plan_contratado
+                const direccion_contrato  = req.body.direccion_contrato
+                const motivo_standby  = req.body.motivo_standby
+                const fecha_instalacion  = req.body.fecha_instalacion
+                const recursos_inventario_instalacion  = req.body.recursos_inventario_instalacion
+                const observaciones_instalacion  = req.body.observaciones_instalacion
+                const telefono_cliente  = req.body.telefono_cliente
+                const contratista_asignado  = req.body.contratista_asignado
+                const nodo  = req.body.nodo
+                     if (!(id &&fecha_contrato  &&estatus_  &&id_cuenta  &&plan_contratado  &&direccion_contrato  &&nodo )){
+                         await   res.render('updateContrato', {
+                                login: true,
+                                rol:req.session.rol,
+                                alert: true,
+                                id_contrat:req.session.c_identidad,
+                                contratos: contrat,
+                                empresa_contratista:req.session.empresa_contratista,
+                                alertTitle: "Error",
+                                alertMessage: "Complete todos los campos marcados con *",
+                                alertIcon:'error',
+                                showConfirmButton: true,
+                                timer: false,
+                                ruta: `update-contrato/${id_contrato}`
+                            });
+                    
+                        }else{
+                        connection.query ('SELECT id FROM contratos WHERE id != ?', [id_contrato], async (error, results, fields)=> {
+                            let resultados_array = [  '',  '',  '', '',  '',  '',  '']
+                           if (results != 0){
+                            resultados_array = results
+                           }
+                            console.log((resultados_array))
+                            console.log(contrat)
+                            let comp_id = false
+                            let encontrado = false
+                            for (let index = 0; index < resultados_array.length; index++) {
+                                if (id==resultados_array[index].id){
+                                    encontrado = true
+                                   
+                                    break
+                                }
+                            }
+                            if (encontrado){
+                                comp_id = true
+                                console.log('id es igual a compid')
+                            } else{
+                                comp_id = false
+                                console.log('id NO es igual a compid')
+                            }
+                            // tenemos problemas XDD
+            
+                            //resuelto uwu
+                            console.log(comp_id, id)
+                            if (comp_id) {
+                                            res.render('updateContrato', {
+                                                login: true,
+                                                rol:req.session.rol,
+                                                id_contrat:req.session.c_identidad,
+                                                contratos: contrat,
+                                                empresa_contratista:req.session.empresa_contratista,
+                                                alert: true,
+                                                alertTitle: "Error",
+                                                alertMessage: "CONTRATO YA REGISTRADO",
+                                                alertIcon:'error',
+                                                showConfirmButton: true,
+                                                timer: false,
+                                                ruta: `update-contrato/${id_contrato}`  })
+                            } else {  
+                                connection.query(`UPDATE contratos SET id='${id}',
+                                    fecha_contrato='${fecha_contrato}',
+                                    estatus_='${estatus_}',
+                                    ci_cliente= '${ci_cliente}',
+                                    id_cuenta='${id_cuenta}',
+                                    plan_contratado='${plan_contratado}',
+                                    direccion_contrato='${direccion_contrato}',
+                                    motivo_standby='${motivo_standby}',
+                                    fecha_instalacion='${fecha_instalacion}',
+                                    recursos_inventario_instalacion='${recursos_inventario_instalacion}',
+                                    observaciones_instalacion='${observaciones_instalacion}',
+                                    telefono_cliente='${telefono_cliente}',
+                                    contratista_asignado='${contratista_asignado}',
+                                    nodo='${nodo}' WHERE id = '${id_contrato}'` ,async (error,results, fields) =>{ res.render('updateContrato', {
+                                    login: true,
+                                    rol: req.session.rol,
+                                    alert: true,
+                                    contratos: contrat,
+                                    empresa_contratista:req.session.empresa_contratista,
+                                    alertTitle: "Registration",
+                                    alertMessage: "¡Actualización Correcta!",
+                                    alertIcon:'success',
+                                    showConfirmButton: false,
+                                    timer: 1500,
+                                    ruta: 'index'
+                                
+                                    }
+                                )
+                                if (error){console.log(error)} else {console.log(results)}
+                            }
+                        )
+                                    }
+                                })                 
+                            }
             }else{
                 const id  = req.body.id                                    
     const fecha_contrato  = req.body.fecha_contrato
@@ -933,6 +1047,7 @@ export const updateContratMethod = async (req,res)=>{
                     alert: true,
                     id_contrat:req.session.c_identidad,
                     contratos: contrat,
+                    empresa_contratista:req.session.empresa_contratista,
                     alertTitle: "Error",
                     alertMessage: "Complete todos los campos marcados con *",
                     alertIcon:'error',
@@ -975,6 +1090,7 @@ export const updateContratMethod = async (req,res)=>{
                                     rol:req.session.rol,
                                     id_contrat:req.session.c_identidad,
                                     contratos: contrat,
+                                    empresa_contratista:req.session.empresa_contratista,
                                     alert: true,
                                     alertTitle: "Error",
                                     alertMessage: "CONTRATO YA REGISTRADO",
@@ -997,9 +1113,10 @@ export const updateContratMethod = async (req,res)=>{
                         telefono_cliente='${telefono_cliente}',
                         nodo='${nodo}' WHERE id = '${id_contrato}'` ,async (error,results, fields) =>{ res.render('updateContrato', {
                         login: true,
-                        rol:true,
+                        rol: req.session.rol,
                         alert: true,
                         contratos: contrat,
+                        empresa_contratista:req.session.empresa_contratista,
                         alertTitle: "Registration",
                         alertMessage: "¡Actualización Correcta!",
                         alertIcon:'success',
@@ -1059,6 +1176,7 @@ export const updateContratistaMethod = async (req,res)=>{
                         alert: true,
                         id_contrat:req.session.c_identidad,
                         contratos: contrat,
+                        empresa_contratista:req.session.empresa_contratista,
                         alertTitle: "Error",
                         alertMessage: "Complete todos los campos marcados con *",
                         alertIcon:'error',
@@ -1119,6 +1237,7 @@ export const updateContratistaMethod = async (req,res)=>{
                                         rol:req.session.rol,
                                         id_contrat:req.session.c_identidad,
                                         contratos: contrat,
+                                        empresa_contratista:req.session.empresa_contratista,
                                         alert: true,
                                         alertTitle: "Error",
                                         alertMessage: "CONTRATISTA YA REGISTRADO",
@@ -1147,6 +1266,7 @@ export const updateContratistaMethod = async (req,res)=>{
                                 rol:true,
                                 alert: true,
                                 contratos: contrat,
+                                empresa_contratista:req.session.empresa_contratista,
                                 alertTitle: "Registration",
                                 alertMessage: "¡Successful Registration!",
                                 alertIcon:'success',
@@ -1162,6 +1282,7 @@ export const updateContratistaMethod = async (req,res)=>{
                             rol:true,
                             alert: true,
                             contratos: contrat,
+                            empresa_contratista:req.session.empresa_contratista,
                             alertTitle: "Error",
                             alertMessage: "Contraseñas no coinciden",
                             alertIcon:'error',
@@ -1188,6 +1309,7 @@ export const updateContratistaMethod = async (req,res)=>{
                             rol:true,
                             alert: true,
                             contratos: contrat,
+                            empresa_contratista:req.session.empresa_contratista,
                             alertTitle: "Registration",
                             alertMessage: "¡Successful Registration!",
                             alertIcon:'success',

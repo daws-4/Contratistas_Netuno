@@ -23,6 +23,8 @@ body {
   }
 
   .contratos_firstview{
+    margin: 2%;
+    bottom: 10%;
     -webkit-box-orient: vertical;
     -webkit-box-direction: vertical;
         -ms-flex-direction: column;
@@ -58,6 +60,7 @@ body {
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  margin-bottom: 10%;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
       -ms-flex-direction: column;
@@ -87,6 +90,53 @@ body {
 .encabezado .logo img {
   width: 150px;
   height: auto; }
+
+
+  .boton-update .botons-green {
+
+    background: #468811;
+    border-color: #24303c;
+    color: white;
+    margin: 16px 0;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .boton-update{
+    padding-left: 2%;
+  }
+
+  .botons-green{
+
+background: #24303c;
+border-radius: 4px;
+margin-bottom: 16px;
+border: 1px solid #24c51f;
+font-family: 'calibri';
+font-size: 18px;
+color: white;
+  }
+  .boton-update .botons-red {
+
+    background: #881111;
+    border-color: #24303c;
+    color: white;
+    margin: 16px 0;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+
+  .botons-red{
+
+background: #24303c;
+border-radius: 4px;
+margin-bottom: 16px;
+border: 1px solid #c51f1f;
+font-family: 'calibri';
+font-size: 18px;
+color: white;
+  }
 
 .boton-buscar, .boton-menu {
   border: 0;
@@ -192,7 +242,7 @@ body {
   border-color: transparent; }
   footer{
     width: 100%;
-    position: relative;
+    position: fixed;
     bottom: 0;
     background-color: rgb(230,230,230);
 }
@@ -200,7 +250,7 @@ body {
 footer p{
     text-align: right ;
     margin: 0;
-    padding: 2%;
+    padding: 1%;
     color: rgb(100,100,100);
 }
 
@@ -364,27 +414,7 @@ footer p{
   text-align: center;
   font-size: .9rem; }
 
-.piedepagina .redes-sociales {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  list-style: none;
-  margin: 0;
-  padding: 0; }
 
-.piedepagina .redes-sociales a {
-  color: #fff;
-  font-size: 2rem;
-  margin: 0 .5rem;
-  opacity: .7;
-  -webkit-transition: all .5s ease;
-  transition: all .5s ease; }
-
-.piedepagina .redes-sociales a:hover {
-  opacity: 1; }
 
 .ir-arriba {
   position: fixed;

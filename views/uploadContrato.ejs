@@ -23,7 +23,9 @@
           <input class="controls" type="text" name="recursos_inventario_instalacion" placeholder="Recursos Utilizados" tabindex="10" >
           <input class="controls" type="text" name="observaciones_instalacion" placeholder="Observaciones" tabindex="11" >
           <input class="controls" type="text" name="contratista_asignado" placeholder="Contratista Asignado" tabindex="12" >
-          <input class="controls" type="text" name="empresa_contratista" placeholder="Empresa Contratista" tabindex="13">
+          <select class="controls" type="text" name="empresa_contratista" placeholder="Empresa Contratista" tabindex="13">
+            <option value="0">Hetelca</option>
+            <option value="1">Servitel</option>
           <input class="controls" type="text" name="telefono_cliente" placeholder="Teléfono del Cliente" tabindex="14"minlength='11' maxlength="11">
           <input class="controls" type="text" name="nodo" placeholder="Nodo*" required tabindex="15" >
           
@@ -80,4 +82,3 @@
         <% } %>
       
     
-<%- include("partials/_footer") %>
