@@ -27,11 +27,13 @@ import {
     contratosPendientes,
     contratosEmitidos,
     uploadContratMethodXML,
-    jsonrender
+    jsonrender,
+    filtroContratos
 } from '../controllers/Controller.js'
 const router = Router();
 
 router.get('/index', loginAuth, );
+router.post('/index', filtroContratos)
 router.get('/', loginView);
 router.post('/', loginContratMethod);
 router.get('/admin', loginAdminView)

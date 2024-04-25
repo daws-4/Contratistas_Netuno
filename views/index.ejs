@@ -20,25 +20,50 @@
         </div>
         <div class="contratos_firstview">
             <h6 id="welcomers"> CONTRATOS </h6>
+            <form action="" method="POST">
+                <input type="Date" name="desde_fecha" id="">
+                <input type="Date" name="hasta_fecha" id="">
+                <input type="text" name="id_contrato" placeholder="Id contrato" id="id_contrato">
+                <select type="" name="estatus_" id=""> 
+                    <option value="">Seleccione Status</option>
+                    <option value="0">Agendado</option>
+                    <option value="1">Finalizado</option>
+                    </select>
+                <select type="text" name="empresa_contratista" id="">
+                    <option value="">Seleccione Contratista</option>
+                    <option value="0">Hetelca</option>
+                    <option value="1">Servitel</option>
+                </select>
+                <input type="text" name="instalador" placeholder="Instalador" id="">
+                <input type="text" name="nodo" placeholder="nodo" id="">
+                <input type="submit" name="" id="">
+            </form>
+
             <table id="lista-contratos" class="principal-table table-striped">
                 <thead> 
                     <tr>
                         <th>Fecha contrato</th>
                         <th>ID del contrato</th>
                         <th>Status</th>
+                        <th>Empresa Contratista</th>
                     </tr>
                 </thead>
                 <% if (contratos[0] != undefined) {%>
-                <tbody>
+                <tbody id="contratos">
                 <% for (let index = 0; index < contratos[0].length; index++) { %>
                     <tr >
-                        <td><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].fecha_contrato %></a></td>
-                        <td><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].id %></a></td>
+                        <td id="fecha"><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].fecha_contrato %></a></td>
+                        <td id="id"><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].id %></a></td>
                         <% if (contratos[0][index].estatus_ == 0){%>
                         <td>Agendado</td>
                         <% }else{ %>
-                        <td>Emitido</td>
+                        <td>Finalizado</td>
                         <% } %>
+                        <% if (contratos[0][index].empresa_contratista == 0){%>
+                            <td>Hetelca</td>
+                            <% }else{ %>
+                            <td>Servitel</td>
+                            <% } %>
                     </tr> 
                 <% } %>
                 </tbody>
@@ -210,32 +235,9 @@
     <script src="contratistas-styles/js/bootstrap.min.js"></script>
     <script src="contratistas-styles/js/owl.carousel.min.js"></script>
     <script type="text/javascript">
-        $(document).ready(function() {
-            $(".owl-carousel").owlCarousel({
-                loop: true,
-                margin: 0,
-                nav: true,
-                autoWidth: false,
-                navText: ['<i class="fa fa-arrow-circle-left" title="Anterior"></i>', '<i class="fa  fa-arrow-circle-right" title="Siguiente"></i>'],
-                responsive: {
-                    0: {
-                        items: 1
-                    },
-                    500: {
-                        items: 2,
-                        margin: 20
-                    },
-                    800: {
-                        items: 3,
-                        margin: 20
-                    },
-                    1000: {
-                        items: 4,
-                        margin: 20
-                    }
-                }
-            });
-        });
+
+
+       
     </script>
     <script src="contratistas-styles/js/wow.min.js"></script>
     <script src="contratistas-styles/js/smooth-scroll.min.js"></script>

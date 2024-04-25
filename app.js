@@ -10,7 +10,7 @@ import router from "./routes/routes.js";
 import multer from "multer";
 import { dirname, join,extname } from "path";
 
-const IP = '172.16.0.197'
+const IP = '172.16.0.219'
 
 const app = express();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

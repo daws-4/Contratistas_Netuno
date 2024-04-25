@@ -665,3 +665,109 @@ footer p{
   .tu-mejor-eleccion ul li p {
     font-size: .85rem; }
   }}
+
+  @media (max-width: 600px){
+    .principal-table{
+      padding: 1rem;
+      margin: 1rem;
+      caption-side: top;
+      table-layout: auto;
+      border-collapse: collapse;
+      border-spacing: 3rem;
+      border-style: outset;
+      display: inline-flex;
+    }
+    .principal-table thead{
+      border-style: groove;
+      display: block;
+    }
+    .principal-table thead tr{
+      display: block;
+    }
+    .principal-table thead tr th{ 
+      font-size: 70%;
+      padding: 1rem;
+      display: flex;
+      margin: 20px;
+    }
+
+    .principal-table tbody tr{
+
+      border-color: #064e4e;
+      border-style: solid;
+      display:block;
+    
+    }
+    .principal-table tbody tr td{
+     font-size: 70%;
+      padding: 1rem;
+      display: flex;
+      margin: 22px;
+    }
+
+
+    .contrat-status{
+      align-items: center;
+    }
+
+    .boton-update{
+        width: 25rem;
+        background: #101d14;
+        padding: 3em;
+        margin: auto;
+        margin-top: 6em;
+        margin-bottom: 6em;
+        border-radius: 4px;
+        font-family: 'calibri';
+        color: white;
+        box-shadow: 7px 13px 37px #000;
+      
+    }
+
+    .boton-update a {
+      
+      background: #468811;
+      border-color: #24303c;
+      color: white;
+      margin: 10rem 0;
+      font-size: 16px;
+      cursor: pointer;
+      
+    }
+    
+    .boton-update{
+      padding-left: 2%;
+    }
+  
+    .botons-green{
+      background: #24303c;
+      border-radius: 4px;
+      margin-bottom: 16px;
+      border: 20px solid #24c51f;
+      font-family: 'calibri';
+      font-size: 18px;
+     color: white;
+    }
+    .boton-update a {
+  
+      background: #881111;
+      border-color: #24303c;
+      color: white;
+      margin: 16px 0;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    
+  
+    .botons-red{
+  
+  background: #24303c;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  border: 20px solid #c51f1f;
+  font-family: 'calibri';
+  font-size: 18px;
+  color: white;
+    }
+ 
+  }
