@@ -48,10 +48,12 @@
                         <td><%=contratos[0][index].fecha_contrato %></td>
                         <td><%=contratos[0][index].id %></td>
                         <% if (contratos[0][index].estatus_ == 0){%>
-                        <td>Agendado</td>
-                        <% }else{ %>
-                        <td>Emitido</td>
-                        <% } %>
+                            <td>Agendado</td>
+                            <% }else if (contratos[0][index].estatus_ == 1){ %>
+                                <td>Instalado</td>
+                            <% }else if(contratos[0][index].estatus_ == 2){ %>
+                                <td>Finalizado</td>
+                            <% } %>
 
                         <td><%=contratos[0][index].ci_cliente %></td>
                         <td><%=contratos[0][index].id_cuenta %></td>
@@ -79,9 +81,17 @@
             <form class="boton-update" action="/update-contrato/<%=contratos[0][0].id%>" method="GET">
                 <a class="botons-green" href="/update-contrato/<%=contratos[0][0].id%>"> EDITAR</a>
                 <a class="botons-red" href="/delete-contrato/<%=contratos[0][0].id%>" onclick="miAlerta()"> ELIMINAR</a>
+                <% if (contratos[0][index].estatus_ != 2) {%>
+                <a class="botons-red" href="/finish-contrato/<%=contratos[0][0].id%>" onclick="miAlerta_Finalizar()"> FINALIZAR</a>
+                <% } %>
                 <script>
                     function miAlerta(evento) {
-                        const confirmDelete = window.confirm("¿Estás seguro que deseas eliminar este registro?")
+                        const confirmDelete = window.confirm("¿Estás seguro que deseas ELIMINAR este contrato?")
+                        if (!(confirmDelete)){
+                            event.preventDefault();
+                        }}
+                        function miAlerta_Finalizar(evento) {
+                        const confirmDelete = window.confirm("¿Estás seguro que deseas FINALIZAR este contrato?")
                         if (!(confirmDelete)){
                             event.preventDefault();
                         }}
@@ -153,11 +163,12 @@
                                 <td><%=contratos[0][index].fecha_contrato %></td>
                                 <td><%=contratos[0][index].id %></td>
                                 <% if (contratos[0][index].estatus_ == 0){%>
-                                <td>Agendado</td>
-                                <% }else{ %>
-                                <td>Emitido</td>
-                                <% } %>
-        
+                                    <td>Agendado</td>
+                                    <% }else if (contratos[0][index].estatus_ == 1){ %>
+                                        <td>Instalado</td>
+                                    <% }else if(contratos[0][index].estatus_ == 2){ %>
+                                        <td>Finalizado</td>
+                                    <% } %>
                                 <td><%=contratos[0][index].ci_cliente %></td>
                                 <td><%=contratos[0][index].id_cuenta %></td>
                                 <td><%=contratos[0][index].plan_contratado %></td>
@@ -174,6 +185,7 @@
                     </table>
                   </div>
                   <div class="contrat-status text center">
+                    <% if (contratos[0][index].estatus_ != 2) {%>
                     <form class="boton-update" action="/update-contrato/<%=contratos[0][0].id%>" method="GET">
                         <a class="botons-green" href="/update-contrato/<%=contratos[0][0].id%>"> EDITAR</a>
                         <a class="botons-red" href="/delete-contrato/<%=contratos[0][0].id%>" onclick="miAlerta()"> ELIMINAR</a>
@@ -185,6 +197,7 @@
                                 }}
                         </script>
                     </form>
+                    <% } %>
                 </div>
                         <% } %>
                         
@@ -262,10 +275,12 @@
                             <td><%=contratos[0][index].fecha_contrato %></td>
                             <td><%=contratos[0][index].id %></td>
                             <% if (contratos[0][index].estatus_ == 0){%>
-                            <td>Agendado</td>
-                            <% }else{ %>
-                            <td>Emitido</td>
-                            <% } %>
+                                <td>Agendado</td>
+                                <% }else if (contratos[0][index].estatus_ == 1){ %>
+                                    <td>Instalado</td>
+                                <% }else if(contratos[0][index].estatus_ == 2){ %>
+                                    <td>Finalizado</td>
+                                <% } %>
                             <td><%=contratos[0][index].ci_cliente %></td>
                             <td><%=contratos[0][index].id_cuenta %></td>
                             <td><%=contratos[0][index].plan_contratado %></td>
@@ -278,22 +293,26 @@
                             <td><%=contratos[0][index].telefono_cliente %></td>
                             <td><%=contratos[0][index].nodo %></td>
                         </tr> 
-                    <% } %>
+                    
                     </tbody>
                 </table>
               </div>
               <% if(id_contrat == contratos[0][0].contratista_asignado) {%>
                 <div class="contrat-status text center">
+                    <% if (contratos[0][index].estatus_ != 2) {%>
                     <form class="boton-update" action="/update-contrato/<%=contratos[0][0].id%>" method="GET">
                         <a class="botons-green" href="/update-contrato/<%=contratos[0][0].id%>"> EDITAR</a>
                     </form>
+                    <% } %>
                 </div>
+                
                 <% }else{ %>
                     
                 <div class="welcomers text-center">
                     <h5 id="welcomers">ESTE CONTRATO NO ESTÁ ASIGNADO A USTED</h5>
                 </div>
             
+                    <% } %>
                     <% } %>
             <% }else{ %>
             <tbody>

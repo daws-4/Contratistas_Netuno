@@ -21,13 +21,29 @@
         <div class="contratos_firstview">
             <h6 id="welcomers"> CONTRATOS </h6>
             <form action="" method="POST">
+                <select name="cantidad" id="can">
+                    <option value="">10</option>
+                    <option value="">20</option>
+                    <option value="">30</option>
+                    <option value="">50</option>
+                    <option value="">100</option>
+
+                </select>
+                <select name="página" id="pag">
+                    <option value="">página 1</option>
+                    <option value="">página 2</option>
+                    <option value="">página 3</option>
+                    <option value="">página 4</option>
+                    <option value="">página 5</option>
+                </select>
                 <input type="Date" name="desde_fecha" id="">
                 <input type="Date" name="hasta_fecha" id="">
                 <input type="text" name="id_contrato" placeholder="Id contrato" id="id_contrato">
                 <select type="" name="estatus_" id=""> 
                     <option value="">Seleccione Status</option>
                     <option value="0">Agendado</option>
-                    <option value="1">Finalizado</option>
+                    <option value="1">Instalado</option>
+                    <option value="2">Finalizado</option>
                     </select>
                 <select type="text" name="empresa_contratista" id="">
                     <option value="">Seleccione Contratista</option>
@@ -55,10 +71,12 @@
                         <td id="fecha"><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].fecha_contrato %></a></td>
                         <td id="id"><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].id %></a></td>
                         <% if (contratos[0][index].estatus_ == 0){%>
-                        <td>Agendado</td>
-                        <% }else{ %>
-                        <td>Finalizado</td>
-                        <% } %>
+                            <td>Agendado</td>
+                            <% }else if (contratos[0][index].estatus_ == 1){ %>
+                                <td>Instalado</td>
+                            <% }else if(contratos[0][index].estatus_ == 2){ %>
+                                <td>Finalizado</td>
+                            <% } %>
                         <% if (contratos[0][index].empresa_contratista == 0){%>
                             <td>Hetelca</td>
                             <% }else{ %>
@@ -108,6 +126,21 @@
             </div>
             <div class="contratos_firstview">
                 <h6 id="welcomers"> CONTRATOS </h6>
+                <select name="limit" id="">
+                    <option value="">10</option>
+                    <option value="">20</option>
+                    <option value="">30</option>
+                    <option value="">50</option>
+                    <option value="">100</option>
+
+                </select>
+                <select name="offset" id="">
+                    <option value="">página 1</option>
+                    <option value="">página 2</option>
+                    <option value="">página 3</option>
+                    <option value="">página 4</option>
+                    <option value="">página 5</option>
+                </select>
                 <form action="" method="POST">
                     <input type="Date" name="desde_fecha" id="">
                     <input type="Date" name="hasta_fecha" id="">
@@ -115,7 +148,8 @@
                     <select type="" name="estatus_" id=""> 
                         <option value="">Seleccione Status</option>
                         <option value="0">Agendado</option>
-                        <option value="1">Finalizado</option>
+                        <option value="1">Instalado</option>
+                        <option value="2">Finalizado</option>
                         </select>
                     <input type="text" name="instalador" placeholder="Instalador" id="">
                     <input type="text" name="nodo" placeholder="nodo" id="">
@@ -137,10 +171,12 @@
                             <td><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].fecha_contrato %></a></td>
                             <td><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].id %></a></td>
                             <% if (contratos[0][index].estatus_ == 0){%>
-                            <td>Agendado</td>
-                            <% }else{ %>
-                            <td>Emitido</td>
-                            <% } %>
+                                <td>Agendado</td>
+                                <% }else if (contratos[0][index].estatus_ == 1){ %>
+                                    <td>Instalado</td>
+                                <% }else if(contratos[0][index].estatus_ == 2){ %>
+                                    <td>Finalizado</td>
+                                <% } %>
                             <% if (contratos[0][index].empresa_contratista == 0){%>
                                 <td>Hetelca</td>
                                 <% }else{ %>
@@ -190,6 +226,34 @@
               </div>
               <div class="contratos_firstview">
                 <h6 id="welcomers"> CONTRATOS <% if (estatus == 1) {%> PENDIENTES <% }else if(estatus == 2){%> EMITIDOS <% }else{ %>  <% } %></h6>
+                <form action="" method="POST">
+                    <select name="limit" id="">
+                        <option value="">10</option>
+                        <option value="">20</option>
+                        <option value="">30</option>
+                        <option value="">50</option>
+                        <option value="">100</option>
+
+                    </select>
+                    <select name="offset" id="">
+                        <option value="">página 1</option>
+                        <option value="">página 2</option>
+                        <option value="">página 3</option>
+                        <option value="">página 4</option>
+                        <option value="">página 5</option>
+                    </select>
+                    <input type="Date" name="desde_fecha" id="">
+                    <input type="Date" name="hasta_fecha" id="">
+                    <input type="text" name="id_contrato" placeholder="Id contrato" id="id_contrato">
+                    <select type="" name="estatus_" id=""> 
+                        <option value="">Seleccione Status</option>
+                        <option value="0">Agendado</option>
+                        <option value="1">Instalado</option>
+                        <option value="2">Finalizado</option>
+                        </select>
+                    <input type="text" name="nodo" placeholder="nodo" id="">
+                    <input type="submit" name="" id="">
+                </form>
                 <table id="lista-contratos" class="principal-table table-striped">
                     <thead> 
                         <tr>
@@ -205,10 +269,12 @@
                             <td><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].fecha_contrato %></a></td>
                             <td><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].id %></a></td>
                             <% if (contratos[0][index].estatus_ == 0){%>
-                            <td>Agendado</td>
-                            <% }else{ %>
-                            <td>Emitido</td>
-                            <% } %>
+                                <td>Agendado</td>
+                                <% }else if (contratos[0][index].estatus_ == 1){ %>
+                                    <td>Instalado</td>
+                                <% }else if(contratos[0][index].estatus_ == 2){ %>
+                                    <td>Finalizado</td>
+                                <% } %>
                         </tr> 
                     <% } %>
                     </tbody>
@@ -263,6 +329,8 @@
     <script src="contratistas-styles/js/sitio.js"></script>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script type="text/javascript">
+
+        
         const socket = io()
     </script>
 </body>

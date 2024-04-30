@@ -16,7 +16,7 @@
           <input class="controls" type="date" name="fecha_contrato" placeholder="Fecha del Contrato*" value="<%=contratos[0][0].fecha_contrato %>" required tabindex="2">
           <select class="controls" type="text" name="estatus_" placeholder="Estado de la Instalación*" value="<%=contratos[0][0].estatus_ %>" required tabindex="3" >
             <option value="0">Agendado</option>
-            <option value="1">Emitido</option>
+            <option value="1">Instalado</option>
           <input class="controls" type="text" name="ci_cliente" placeholder="CI del cliente*" value="<%=contratos[0][0].ci_cliente %>" required tabindex="4" maxlength="30">
           <input class="controls" type="text" name="id_cuenta" placeholder="ID Cuenta del Cliente*" value="<%=contratos[0][0].id_cuenta %>" required tabindex="5" maxlength="30">
           <input class="controls" type="text" name="plan_contratado" placeholder="Plan Contratado*" value="<%=contratos[0][0].plan_contratado %>" required tabindex="6" maxlength="30">
@@ -65,7 +65,7 @@
       <input class="controls" type="date" name="fecha_contrato" placeholder="Fecha del Contrato*" value="<%=contratos[0][0].fecha_contrato %>" required tabindex="2">
       <select class="controls" type="text" name="estatus_" placeholder="Estado de la Instalación*" value="<%=contratos[0][0].estatus_ %>" required tabindex="6" >
         <option value="0">Agendado</option>
-        <option value="1">Emitido</option>
+        <option value="1">Instalado</option>
       <input class="controls" type="text" name="ci_cliente" placeholder="CI del cliente*" value="<%=contratos[0][0].ci_cliente %>" required tabindex="4" maxlength="30">
       <input class="controls" type="text" name="id_cuenta" placeholder="ID Cuenta del Cliente*" value="<%=contratos[0][0].id_cuenta %>" required tabindex="4" maxlength="30">
       <input class="controls" type="text" name="plan_contratado" placeholder="Plan Contratado*" value="<%=contratos[0][0].plan_contratado %>" required tabindex="5" maxlength="30">
@@ -117,13 +117,13 @@
       <section class="form-register">
         <h4>EDITAR CONTRATO</h4>
         <form action="" method="POST">
-        <input class="controls" type="text" name="id" placeholder="ID del Contrato*" value="<%=contratos[0][0].id %>" tabindex="1" autofocus>
-        <input class="controls" type="date" name="fecha_contrato" placeholder="Fecha del Contrato*" value="<%=contratos[0][0].fecha_contrato %>" required tabindex="2">
+        <input class="controls" type="text" name="id" placeholder="ID del Contrato*" value="<%=contratos[0][0].id %>" tabindex="1" autofocus readonly>
+        <input class="controls" type="text" name="fecha_contrato" placeholder="Fecha del Contrato*" value="<%=contratos[0][0].fecha_contrato %>" required tabindex="2" readonly>
         <select class="controls" type="text" name="estatus_" placeholder="Estado de la Insstalación*" value="<%=contratos[0][0].estatus_%>" required tabindex="6" >
           <option value="0">Agendado</option>
-          <option value="1">Emitido</option>
-        <input class="controls" type="text" name="ci_cliente" placeholder="CI del cliente*" value="<%=contratos[0][0].ci_cliente %>" required tabindex="4" maxlength="30">
-        <input class="controls" type="text" name="id_cuenta" placeholder="ID Cuenta del Cliente*" value="<%=contratos[0][0].id_cuenta %>" required tabindex="4" maxlength="30">
+          <option value="1">Instalado</option>
+        <input class="controls" type="text" name="ci_cliente" placeholder="CI del cliente*" value="<%=contratos[0][0].ci_cliente %>" required tabindex="4" maxlength="30" readonly>
+        <input class="controls" type="text" name="id_cuenta" placeholder="ID Cuenta del Cliente*" value="<%=contratos[0][0].id_cuenta %>" required tabindex="4" maxlength="30" readonly>
         <input class="controls" type="text" name="plan_contratado" placeholder="Plan Contratado*" value="<%=contratos[0][0].plan_contratado%>" required tabindex="5" maxlength="30">
         <input class="controls" type="text" name="direccion_contrato" placeholder="Dirección del Contrato*" value="<%=contratos[0][0].direccion_contrato%>"required tabindex="7" >
         <input class="controls" type="text" name="motivo_standby" placeholder="Motivo de Pausa" value="<%=contratos[0][0].motivo_standby%>" tabindex="8" >

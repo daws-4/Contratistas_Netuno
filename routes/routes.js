@@ -28,7 +28,8 @@ import {
     contratosEmitidos,
     uploadContratMethodXML,
     jsonrender,
-    filtroContratos
+    filtroContratos,
+    FinishContrat
 } from '../controllers/Controller.js'
 const router = Router();
 
@@ -47,6 +48,7 @@ router.post('/upload-contrato', uploadContratMethod)
 router.get('/update-contrato/:id', updateContrat)
 router.post('/update-contrato/:id', updateContratMethod)
 router.get ('/delete-contrato/:id', deleteContrat)
+router.get ('/finish-contrato/:id', FinishContrat)
 router.get('/contratista', loginEditContratistaAuth)
 router.get('/contratista/:id', loadContratista)
 router.get('/update-contratista/:id', updateContratista)
