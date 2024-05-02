@@ -1,6 +1,7 @@
 <%- include("partials/_head") %>
     <% if (login) {%>
 <!--Menu superior ADMINISTRADORES--> <% if (rol == 2) {%>
+
 </head>
 <body>
     
@@ -22,19 +23,19 @@
             <h6 id="welcomers"> CONTRATOS </h6>
             <form action="" method="POST">
                 <select name="cantidad" id="can">
-                    <option value="">10</option>
-                    <option value="">20</option>
-                    <option value="">30</option>
-                    <option value="">50</option>
-                    <option value="">100</option>
-
+                    <option value="">*</option>
+                    <option id="o10" value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
                 </select>
                 <select name="página" id="pag">
-                    <option value="">página 1</option>
-                    <option value="">página 2</option>
-                    <option value="">página 3</option>
-                    <option value="">página 4</option>
-                    <option value="">página 5</option>
+                    <option value="1">página 1</option>
+                    <option value="2">página 2</option>
+                    <option value="3">página 3</option>
+                    <option value="4">página 4</option>
+                    <option value="5">página 5</option>
                 </select>
                 <input type="Date" name="desde_fecha" id="">
                 <input type="Date" name="hasta_fecha" id="">
@@ -67,7 +68,7 @@
                 <% if (contratos[0] != undefined) {%>
                 <tbody id="contratos">
                 <% for (let index = 0; index < contratos[0].length; index++) { %>
-                    <tr >
+                    <tr id="tr<%=index %>"  >
                         <td id="fecha"><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].fecha_contrato %></a></td>
                         <td id="id"><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].id %></a></td>
                         <% if (contratos[0][index].estatus_ == 0){%>
@@ -307,7 +308,7 @@
                 </section>
                     <% } %>
             
-                    
+                    <button class="boton-subir">subir</button>
     
 
 
@@ -330,8 +331,117 @@
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script type="text/javascript">
 
+
         
-        const socket = io()
+        let contratos_ = document.getElementById('contratos')
+        console.log(tr11)
+        let columnas = contratos.children
+        
+        const pagina = document.getElementById('pag')
+        const cantidad = document.getElementById('can')
+        function recargar() {
+            window.location.reload()
+        }
+     const separador_cantidad = async ()=>{
+        let columnas_contratos = []
+        console.log(cantidad.options[cantidad.selectedIndex].value);
+             if(cantidad.options[cantidad.selectedIndex].value == 10){
+                    console.log(columnas.length)
+                    for (let index = 10; index < columnas.length; index){
+                    console.log(index)
+                    let inicio = columnas[index].parentNode.removeChild(columnas[index])
+                    columnas_contratos.push(inicio)
+                    console.log ('se ha eliminado la columna ', inicio, columnas_contratos)
+                    console.log(columnas_contratos.lenght)
+                    }
+                }else if(cantidad.options[cantidad.selectedIndex].value == 20){
+                console.log(columnas.length)
+                    for (let index = 20; index < columnas.length; index){
+                    console.log(index)
+                    let inicio = columnas[index].parentNode.removeChild(columnas[index])
+                    columnas_contratos.push(inicio)
+                    console.log ('se ha eliminado la columna ', inicio)
+                    }
+                }else if(cantidad.options[cantidad.selectedIndex].value == 30){
+                console.log(columnas.length)
+                    for (let index = 30; index < columnas.length; index){
+                    console.log(index)
+                    let inicio = columnas[index].parentNode.removeChild(columnas[index])
+                    columnas_contratos.push(inicio)
+                    console.log ('se ha eliminado la columna ', inicio)
+                    }
+                }else if(cantidad.options[cantidad.selectedIndex].value == 50){
+                console.log(columnas.length)
+                    for (let index = 50; index < columnas.length; index){
+                    console.log(index)
+                    let inicio = columnas[index].parentNode.removeChild(columnas[index])
+                    columnas_contratos.push(inicio)
+                    console.log ('se ha eliminado la columna ', inicio)
+                    }
+                }else if(cantidad.options[cantidad.selectedIndex].value == 100){
+                console.log(columnas.length)
+                    for (let index = 100; index < columnas.length; index){
+                    console.log(index)
+                    let inicio = columnas[index].parentNode.removeChild(columnas[index])
+                    columnas_contratos.push(inicio)
+                    console.log ('se ha eliminado la columna ', inicio)
+                    }
+                }else{
+                    window.location.reload()
+                }
+        }
+       function separador_pagina(event){
+
+        
+        console.log(pagina.options[pagina.selectedIndex].value);
+
+        console.log(cantidad.options[cantidad.selectedIndex].value);
+        if(cantidad.options[cantidad.selectedIndex].value == 10 && pagina.options[pagina.selectedIndex].value == 1){
+                    console.log(columnas.length)
+                }else if(cantidad.options[cantidad.selectedIndex].value == 20){
+                console.log(columnas.length)
+                    for (let index = 20; index < columnas.length; index){
+                    console.log(index)
+                    let inicio = columnas[index].parentNode.removeChild(columnas[index])
+                    console.log ('se ha eliminado la columna ', inicio)
+                    }
+                }else if(cantidad.options[cantidad.selectedIndex].value == 30){
+                console.log(columnas.length)
+                    for (let index = 30; index < columnas.length; index){
+                    console.log(index)
+                    let inicio = columnas[index].parentNode.removeChild(columnas[index])
+                    console.log ('se ha eliminado la columna ', inicio)
+                    }
+                }else if(cantidad.options[cantidad.selectedIndex].value == 50){
+                console.log(columnas.length)
+                    for (let index = 50; index < columnas.length; index){
+                    console.log(index)
+                    let inicio = columnas[index].parentNode.removeChild(columnas[index])
+                    console.log ('se ha eliminado la columna ', inicio)
+                    }
+                }else if(cantidad.options[cantidad.selectedIndex].value == 100){
+                console.log(columnas.length)
+                    for (let index = 100; index < columnas.length; index){
+                    console.log(index)
+                    let inicio = columnas[index].parentNode.removeChild(columnas[index])
+                    console.log ('se ha eliminado la columna ', inicio)
+                    }
+             }
+        
+        }
+
+        if(!(pagina.options[pagina.selectedIndex].value && cantidad.options[cantidad.selectedIndex].value)){
+            cantidad.addEventListener("change", separador_cantidad);
+
+        
+        }
+        pagina.addEventListener("change", separador_pagina)
+
+        
+
+
+
+        console.log(columnas)
     </script>
 </body>
 

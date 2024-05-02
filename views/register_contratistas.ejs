@@ -36,8 +36,8 @@
      title:'<%= alertTitle %>',
      text:'<%= alertMessage %>',
      icon:'<%= alertIcon %>',
-     showConfirmButton: <%= showConfirmButton %>,
-     timer: <%= timer %>
+     showConfirmButton: '<%= showConfirmButton %>',
+     timer: '<%= timer %>'
    }).then(()=>{
      window.location='/<%= ruta %>'
    })
@@ -51,18 +51,6 @@
           </section>
           <script src="/styles/sweetalert210.js"></script>
     
-              <% if (typeof alert != "undefined")  { %>
-                <script>
-                Swal.fire({
-       title:'<%= alertTitle %>',
-       text:'<%= alertMessage %>',
-       icon:'<%= alertIcon %>',
-       showConfirmButton: <%= showConfirmButton %>,
-       timer: <%= timer %>
-     }).then(()=>{
-       window.location='/<%= ruta %>'
-     })
-     </script>
-     <% } %>
+              
         <% } %>
       

@@ -48,11 +48,11 @@
             <% if (typeof alert != "undefined")  { %>
               <script>
               Swal.fire({
-     title:'<%= alertTitle %>',
+                title:'<%= alertTitle %>',
      text:'<%= alertMessage %>',
      icon:'<%= alertIcon %>',
-     showConfirmButton: <%= showConfirmButton %>,
-     timer: <%= timer %>
+     showConfirmButton: '<%= showConfirmButton %>',
+     timer: '<%= timer %>'
    }).then(()=>{
      window.location='/<%= ruta %>'
    })
@@ -101,11 +101,11 @@
         <% if (typeof alert != "undefined")  { %>
           <script>
           Swal.fire({
- title:'<%= alertTitle %>',
- text:'<%= alertMessage %>',
- icon:'<%= alertIcon %>',
- showConfirmButton: <%= showConfirmButton %>,
- timer: <%= timer %>
+            title:'<%= alertTitle %>',
+     text: `<%= alertMessage %>`,
+     icon:'<%= alertIcon %>',
+     showConfirmButton: '<%= showConfirmButton %>',
+     timer: '<%= timer %>'
 }).then(()=>{
  window.location='/<%= ruta %>'
 })
@@ -117,21 +117,6 @@
             <h4>USTED NO TIENE PERMISOS PARA ACCEDER A ESTA PÁGINA</h4>
             <a href="index">volver al inicio</a>
           </section>
-          <script src="/styles/sweetalert210.js"></script>
-    
-              <% if (typeof alert != "undefined")  { %>
-                <script>
-                Swal.fire({
-       title:'<%= alertTitle %>',
-       text:'<%= alertMessage %>',
-       icon:'<%= alertIcon %>',
-       showConfirmButton: <%= showConfirmButton %>,
-       timer: <%= timer %>
-     }).then(()=>{
-       window.location='/<%= ruta %>'
-     })
-     </script>
-     <% } %>
         <% } %>
       
     

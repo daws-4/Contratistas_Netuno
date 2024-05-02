@@ -10,8 +10,6 @@ import fs, { rmSync } from 'node:fs'
 import formidable from "formidable";
 import { dirname, extname, join } from 'path';
 import { fileURLToPath } from 'url';
-import { format } from "node:path";
-import { isUndefined } from "node:util";
 
 
 const CURRENT_DIR = dirname(fileURLToPath(import.meta.url));
@@ -52,7 +50,7 @@ if (email && password) {
                     alertMessage: "USUARIO y/o CONTRASEÑA incorrectos",
                     alertIcon:'error',
                     showConfirmButton: true,
-                    timer: false,
+                    timer: '',
                     ruta: ''    
                 });
             
@@ -73,7 +71,7 @@ if (email && password) {
                 alertTitle: "Conexión exitosa",
                 alertMessage: "¡LOGIN CORRECTO!",
                 alertIcon:'success',
-                showConfirmButton: false,
+                showConfirmButton: '',
                 timer: 1500,
                 ruta: 'index'
             });        			
@@ -100,7 +98,7 @@ export const loginAdminMethod = async (req, res)=> {
                         alertMessage: "USUARIO y/o CONTRASEÑA incorrectos",
                         alertIcon:'error',
                         showConfirmButton: true,
-                        timer: false,
+                        timer: '',
                         ruta: '',
                     });
                 
@@ -122,7 +120,7 @@ export const loginAdminMethod = async (req, res)=> {
                     alertTitle: "Conexión exitosa",
                     alertMessage: "¡LOGIN CORRECTO!",
                     alertIcon:'success',
-                    showConfirmButton: false,
+                    showConfirmButton: '',
                     timer: 1500,
                     ruta: 'index',
                 });        			
@@ -146,7 +144,7 @@ export const loginAuth = async (req, res, next)=> {
             if (req.session.loggedin) {
                 if( results != undefined){
                         let contrat = [results]
-                        console.log('cagaste')
+                        console.log(contrat[0])
                         await res.render('index',{
                             estatus: false,
                             login: true,
@@ -524,7 +522,7 @@ export const registerMethod = async (req, res)=>{
                 alertMessage: "Complete todos los campos",
                 alertIcon:'error',
                 showConfirmButton: true,
-                timer: false,
+                timer: '',
                 ruta: 'register'
             });
     
@@ -537,7 +535,7 @@ export const registerMethod = async (req, res)=>{
                 alertMessage: "Contraseñas no coinciden",
                 alertIcon:'error',
                 showConfirmButton: true,
-                timer: false,
+                timer: '',
                 ruta: 'register'
             });
     
@@ -558,7 +556,7 @@ export const registerMethod = async (req, res)=>{
                                 alertMessage: "Datos ya existentes (Correo Electrónico)",
                                 alertIcon:'error',
                                 showConfirmButton: true,
-                                timer: false,
+                                timer: '',
                                 ruta: 'register'   })
             } else {
                 connection.query ('SELECT * FROM contratistas WHERE n_telefono = ?', [n_telefono], async (error, results, fields)=> {
@@ -575,7 +573,7 @@ export const registerMethod = async (req, res)=>{
                         alertMessage: "Datos ya existentes (Número de Teléfono)",
                         alertIcon:'error',
                         showConfirmButton: true,
-                        timer: false,
+                        timer: '',
                         ruta: 'register'   })
                 } else {
                 connection.query('SELECT * FROM contratistas WHERE c_identidad =?', [c_identidad], async (error, results, fields)=> {
@@ -592,7 +590,7 @@ export const registerMethod = async (req, res)=>{
                             alertMessage: "Datos ya existentes (Cédula de Identidad)",
                             alertIcon:'error',
                             showConfirmButton: true,
-                            timer: false,
+                            timer: '',
                             ruta: 'register'   })
                     } else {
                         let passwordHash = await bcrypt.hash(pass, 8);  
@@ -603,7 +601,7 @@ export const registerMethod = async (req, res)=>{
                     alertTitle: "Registration",
                     alertMessage: "¡Successful Registration!",
                     alertIcon:'success',
-                    showConfirmButton: false,
+                    showConfirmButton: '',
                     timer: 1500,
                     ruta: 'index'
                 });})
@@ -715,7 +713,7 @@ if(req.session.rol == 2){
                 alertMessage: "Complete todos los campos marcados con *",
                 alertIcon:'error',
                 showConfirmButton: true,
-                timer: false,
+                timer: '',
                 ruta: 'register'
             });
     
@@ -735,7 +733,7 @@ if(req.session.rol == 2){
                                 alertMessage: "CONTRATO YA REGISTRADO",
                                 alertIcon:'error',
                                 showConfirmButton: true,
-                                timer: false,
+                                timer: '',
                                 ruta: 'register'   })
             } else {  
                 connection.query('INSERT INTO contratos SET ?',{id:id,
@@ -759,7 +757,7 @@ if(req.session.rol == 2){
                     alertTitle: "Registration",
                     alertMessage: "¡Successful Registration!",
                     alertIcon:'success',
-                    showConfirmButton: false,
+                    showConfirmButton: '',
                     timer: 1500,
                     ruta: 'index'
                 });})
@@ -776,7 +774,7 @@ if(req.session.rol == 2){
                        alertMessage: "Complete todos los campos marcados con *",
                        alertIcon:'error',
                        showConfirmButton: true,
-                       timer: false,
+                       timer: '',
                        ruta: 'register'
                    });
            
@@ -796,7 +794,7 @@ if(req.session.rol == 2){
                                        alertMessage: "CONTRATO YA REGISTRADO",
                                        alertIcon:'error',
                                        showConfirmButton: true,
-                                       timer: false,
+                                       timer: '',
                                        ruta: 'register'   })
                    } else {  
                        connection.query('INSERT INTO contratos SET ?',{id:id,
@@ -820,7 +818,7 @@ if(req.session.rol == 2){
                            alertTitle: "Registration",
                            alertMessage: "¡Successful Registration!",
                            alertIcon:'success',
-                           showConfirmButton: false,
+                           showConfirmButton: '',
                            timer: 1500,
                            ruta: 'index'
                        });})
@@ -841,26 +839,87 @@ export const jsonrender = async (req,res,next) =>{
         parser.parseString(data, function (err, result) {
             if (err){
                 console.log(err)
+                res.render('uploadContrato', {
+                    login:true,
+                    rol: 2,
+                    alert: true,
+                    alertTitle: "Carga Fallida",
+                    alertMessage: 'Error de Sintáxis',
+                    alertIcon:'error',
+                    showConfirmButton: true,
+                    timer: '',
+                    ruta: 'upload-contrato'})
             }else{
-                for (let index = 0; index < result.contratos.contrato.length; index++) {
-                    connection.query('INSERT INTO contratos SET ?', result.contratos.contrato[index], async (error, results, fields)=>{
-                        if (error)
-                        {
-                            console.log(error)
-                        }else{
-                            console.log(results)
+                var confirmConfirm = false
+                connection.query(`SELECT id FROM contratos`, async (error,results) =>{
+                    console.log(results)
+                    let confirm= false
+                    for (let i = 0; i < result.contratos.contrato.length; i++) {
+                       console.log(`resultado ${i} `, result.contratos.contrato[i].id)
+
+
+
+                       for(let j = 0; j<results.length; j++){
+                        console.log(results[j].id)
+
+                        if (results[j].id == result.contratos.contrato[i].id) {
+                            console.log(`ID ${results[j].id} YA EXISTENTE`)
+                            confirm = true
+                            break
                         }
-                    })
-                }
-        
+                       }
+                       if (confirm){
+                        res.render('uploadContrato', {
+                                        login:true,
+                                        rol: 2,
+                                        alert: true,
+                                        alertTitle: "Carga Fallida",
+                                        alertMessage: `ID ${result.contratos.contrato[i].id} YA EXISTENTE`,
+                                        alertIcon:'error',
+                                        showConfirmButton: true,
+                                        timer: '',
+                                        ruta: 'upload-contrato'})
+
+
+                        break
+                       }else{
+                        console.log('lo lograste prro')
+                        connection.query('INSERT INTO contratos SET ?', result.contratos.contrato[i], async (error, results, fields)=>{
+                        if (!(error)){
+                            console.log(results)
+                            console.log('todo bn carnal')
+
+                            
+ 
+                        }else{
+                            console.log(error)}
+                             confirmConfirm = true
+                        })
+                       }
+                       
+                    }
+                    if(confirmConfirm == false){
+                        res.render('uploadContrato', {
+                            login:true,
+                            rol:2,
+                            alert: true,
+                            alertTitle: "subida exitosa",
+                            alertMessage: "TODOS LOS CONTRATOS DE SU ARCHIVO XML",
+                            alertIcon:'success',
+                            showConfirmButton: '1',
+                            timer: '',
+                            ruta: 'index'
+                        });      
+                       }
+                })
+              
         console.log(result.contratos.contrato)
-        console.log(result);
-        console.log('Done');
+
     }
         
     });}
     });
-    res.redirect('/index')
+
 } 
 
 export const uploadContratMethodXML = multerUpload.single('file')
@@ -901,7 +960,7 @@ export const updateContratMethod = async (req,res)=>{
                     alertMessage: "Complete todos los campos marcados con *",
                     alertIcon:'error',
                     showConfirmButton: true,
-                    timer: false,
+                    timer: '',
                     ruta: `update-contrato/${id_contrato}`
                 });
         
@@ -945,7 +1004,7 @@ export const updateContratMethod = async (req,res)=>{
                                     alertMessage: "CONTRATO YA REGISTRADO",
                                     alertIcon:'error',
                                     showConfirmButton: true,
-                                    timer: false,
+                                    timer: '',
                                     ruta: `update-contrato/${id_contrato}`  })  
                 } else {  
                     connection.query(`UPDATE contratos SET id='${id}',
@@ -977,7 +1036,7 @@ export const updateContratMethod = async (req,res)=>{
                         alertTitle: "Registration",
                         alertMessage: "¡Successful Registration!",
                         alertIcon:'success',
-                        showConfirmButton: false,
+                        showConfirmButton: '',
                         timer: 1500,
                         ruta: 'index'
                     });}})
@@ -1082,7 +1141,7 @@ export const updateContratMethod = async (req,res)=>{
                                     alertTitle: "Registration",
                                     alertMessage: "¡Actualización Correcta!",
                                     alertIcon:'success',
-                                    showConfirmButton: false,
+                                    showConfirmButton: '',
                                     timer: 1500,
                                     ruta: 'index'
                                 
@@ -1187,7 +1246,7 @@ export const updateContratMethod = async (req,res)=>{
                         alertTitle: "Registration",
                         alertMessage: "¡Actualización Correcta!",
                         alertIcon:'success',
-                        showConfirmButton: false,
+                        showConfirmButton: '',
                         timer: 1500,
                         ruta: 'index'
                     
@@ -1353,7 +1412,7 @@ export const updateContratistaMethod = async (req,res)=>{
                                 alertTitle: "Registration",
                                 alertMessage: "¡Successful Registration!",
                                 alertIcon:'success',
-                                showConfirmButton: false,
+                                showConfirmButton: '',
                                 timer: 1500,
                                 ruta: `contratista/${id_contratista}`
                             })};})
@@ -1396,7 +1455,7 @@ export const updateContratistaMethod = async (req,res)=>{
                             alertTitle: "Registration",
                             alertMessage: "¡Successful Registration!",
                             alertIcon:'success',
-                            showConfirmButton: false,
+                            showConfirmButton: '',
                             timer: 1500,
                             ruta:  `contratista/${id_contratista}`
                         });}})
