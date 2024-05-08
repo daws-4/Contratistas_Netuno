@@ -42,7 +42,7 @@
                         <td><%=contratos[0][index].C_Identidad %></td>
                         <td><%=contratos[0][index].Nombres %></td>
                         <td><%=contratos[0][index].Apellidos %></td>
-                        <%if (contratos[0][index].empresa_contratista) {%>
+                        <%if (contratos[0][index].empresa) {%>
                         <td>Servitel</td>
                         <% }else{ %>
                         <td>Hetelca</td>
@@ -243,14 +243,14 @@
     <% if (typeof alert != "undefined")  { %>
       <script>
       Swal.fire({
-        title:'<%= alertTitle %>',
-        text:'<%= alertMessage %>',
-        icon:'<%= alertIcon %>',
-        showConfirmButton: <%= showConfirmButton %>,
-        timer: <%= timer %>
-        }).then(()=>{
-        window.location='/<%= ruta %>'
-        })
+     title:'<%= alertTitle %>',
+     text:'<%= alertMessage %>',
+     icon:'<%= alertIcon %>',
+     showConfirmButton: '<%= showConfirmButton %>',
+     timer: '<%= timer %>'
+   }).then(()=>{
+     window.location='/<%= ruta %>'
+   })
         </script>
         <% } %>
     <script type="text/javascript">

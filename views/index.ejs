@@ -21,26 +21,59 @@
         </div>
         <div class="estadisticas">
 
-            
+            <table id="estadisticas" class="principal-table table-striped">
+                <thead>
+                    <th>Contratos Registrados</th>
+                    <th>Contratos Instalados</th>
+                    <th>Contratos Finalizados</th>
+                    <th>Contratos Pendientes</th>
+                </thead>
+                <tbody>
+                    <td><%=contratos[0].length %></td>
+                    <% let instalados = contratos[0].filter(status => status.estatus_ == 1) %>
+                    <td><%= instalados.length%></td>
+                    <% let finalizados = contratos[0].filter(status => status.estatus_ == 2) %>
+                    <td><%= finalizados.length %></td>
+                    <% let agendados = contratos[0].filter(status => status.estatus_ == 0) %>
+                    <td><%= agendados.length %></td>
+                </tbody>
+            </table>
+
+            <table id="estadisticas_2" class="principal-table table-striped">
+                <thead>
+                    <th>Contratos Instalados Servitel</th>
+                    <th>Contratos Pendientes Servitel</th>
+                    <th>Contratos Instalados Hetelca</th>
+                    <th>Contratos Pendientes Hetelca</th>
+                </thead>
+                <tbody>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tbody>
+            </table>
         </div>
         <div class="contratos_firstview">
             <h6 id="welcomers"> CONTRATOS </h6>
-            <form action="" method="POST">
+            <form action="">
                 <select name="cantidad" id="can">
-                    <option value="">*</option>
-                    <option id="o10" value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="30">30</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select>
-                <select name="página" id="pag">
-                    <option value="1">página 1</option>
-                    <option value="2">página 2</option>
-                    <option value="3">página 3</option>
-                    <option value="4">página 4</option>
-                    <option value="5">página 5</option>
-                </select>
+                <option value="">*</option>
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+            <select name="página" id="pag">
+                <option value="1">página 1</option>
+                <option value="2">página 2</option>
+                <option value="3">página 3</option>
+                <option value="4">página 4</option>
+                <option value="5">página 5</option>
+            </select>
+            </form>
+            <form action="" method="POST">
                 <input type="Date" name="desde_fecha" id="">
                 <input type="Date" name="hasta_fecha" id="">
                 <input type="text" name="id_contrato" placeholder="Id contrato" id="id_contrato">
@@ -63,6 +96,7 @@
             <table id="lista-contratos" class="principal-table table-striped">
                 <thead> 
                     <tr>
+                        <th>#</th>
                         <th>Fecha contrato</th>
                         <th>ID del contrato</th>
                         <th>Status</th>
@@ -73,7 +107,8 @@
                 <tbody id="contratos">
                 <% for (let index = 0; index < contratos[0].length; index++) { %>
                     <tr id="tr<%=index %>"  >
-                        <td id="fecha"><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].fecha_contrato %></a></td>
+                        <td><%=index+1 %> </td>
+                        <td  id="fecha"><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].fecha_contrato %></a></td>
                         <td id="id"><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].id %></a></td>
                         <% if (contratos[0][index].estatus_ == 0){%>
                             <td>Agendado</td>
@@ -129,23 +164,60 @@
     
                <% } %>
             </div>
+            <div class="estadisticas">
+
+                <table id="estadisticas" class="principal-table table-striped">
+                    <thead>
+                        <th>Contratos Registrados</th>
+                        <th>Contratos Instalados</th>
+                        <th>Contratos Finalizados</th>
+                        <th>Contratos Pendientes</th>
+                    </thead>
+                    <tbody>
+                        <td><%=contratos[0].length %></td>
+                        <% let instalados = contratos[0].filter(status => status.estatus_ == 1) %>
+                        <td><%= instalados.length%></td>
+                        <% let finalizados = contratos[0].filter(status => status.estatus_ == 2) %>
+                        <td><%= finalizados.length %></td>
+                        <% let agendados = contratos[0].filter(status => status.estatus_ == 0) %>
+                        <td><%= agendados.length %></td>
+                    </tbody>
+                </table>
+    
+                <table id="estadisticas_2" class="principal-table table-striped">
+                    <thead>
+                        <th>Contratos Instalados Servitel</th>
+                        <th>Contratos Pendientes Servitel</th>
+                        <th>Contratos Instalados Hetelca</th>
+                        <th>Contratos Pendientes Hetelca</th>
+                    </thead>
+                    <tbody>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tbody>
+                </table>
+            </div>
             <div class="contratos_firstview">
                 <h6 id="welcomers"> CONTRATOS </h6>
-                <select name="limit" id="">
-                    <option value="">10</option>
-                    <option value="">20</option>
-                    <option value="">30</option>
-                    <option value="">50</option>
-                    <option value="">100</option>
-
+                <form action="">
+                    <select name="cantidad" id="can">
+                    <option value="">*</option>
+                    <option value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="30">30</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
                 </select>
-                <select name="offset" id="">
-                    <option value="">página 1</option>
-                    <option value="">página 2</option>
-                    <option value="">página 3</option>
-                    <option value="">página 4</option>
-                    <option value="">página 5</option>
+                <select name="página" id="pag">
+                    <option value="1">página 1</option>
+                    <option value="2">página 2</option>
+                    <option value="3">página 3</option>
+                    <option value="4">página 4</option>
+                    <option value="5">página 5</option>
                 </select>
+                </form>
                 <form action="" method="POST">
                     <input type="Date" name="desde_fecha" id="">
                     <input type="Date" name="hasta_fecha" id="">
@@ -163,6 +235,7 @@
                 <table id="lista-contratos" class="principal-table table-striped">
                     <thead> 
                         <tr>
+                            <th>#</th>
                             <th>Fecha contrato</th>
                             <th>ID del contrato</th>
                             <th>Status</th>
@@ -170,9 +243,10 @@
                         </tr>
                     </thead>
                     <% if (contratos[0] != undefined) {%>
-                    <tbody>
+                    <tbody id="contratos">
                     <% for (let index = 0; index < contratos[0].length; index++) { %>
-                        <tr >
+                        <tr id="tr<%=index %>">
+                            <td><%=index+1 %> </td>
                             <td><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].fecha_contrato %></a></td>
                             <td><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].id %></a></td>
                             <% if (contratos[0][index].estatus_ == 0){%>
@@ -232,21 +306,6 @@
               <div class="contratos_firstview">
                 <h6 id="welcomers"> CONTRATOS <% if (estatus == 1) {%> PENDIENTES <% }else if(estatus == 2){%> EMITIDOS <% }else{ %>  <% } %></h6>
                 <form action="" method="POST">
-                    <select name="limit" id="">
-                        <option value="">10</option>
-                        <option value="">20</option>
-                        <option value="">30</option>
-                        <option value="">50</option>
-                        <option value="">100</option>
-
-                    </select>
-                    <select name="offset" id="">
-                        <option value="">página 1</option>
-                        <option value="">página 2</option>
-                        <option value="">página 3</option>
-                        <option value="">página 4</option>
-                        <option value="">página 5</option>
-                    </select>
                     <input type="Date" name="desde_fecha" id="">
                     <input type="Date" name="hasta_fecha" id="">
                     <input type="text" name="id_contrato" placeholder="Id contrato" id="id_contrato">
@@ -334,14 +393,20 @@
     <script src="contratistas-styles/js/sitio.js"></script>
     <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script type="text/javascript">
+    
+
         var ContratArray = []
+        var dateArray = []
         let contratos_ = document.getElementById('contratos')
         let columnas = contratos.children
+
+
+        
         for (let index = 0; index < columnas.length; index++) {
-            // ContratArray = columnas[index]
-            ContratArray.push(columnas[index]) 
+            ContratArray.push(columnas[index])
         }
         console.log(ContratArray)
+        console.log(dateArray)
         
         const pagina = document.getElementById('pag')
         const cantidad = document.getElementById('can')

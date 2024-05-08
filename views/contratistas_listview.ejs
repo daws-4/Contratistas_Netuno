@@ -40,7 +40,7 @@
                         <td><a href="/contratista/<%=contratistas[0][index].C_Identidad %>"><%=contratistas[0][index].contratos_pendientes %></a></td>
                         <td><a href="/contratista/<%=contratistas[0][index].C_Identidad %>">
                             
-                            <%if (contratistas[0][index].empresa_contratista) {%>
+                            <%if (contratistas[0][index].empresa == 1) {%>
                                 Servitel
                                 <% }else{ %>
                                 Hetelca

@@ -63,7 +63,7 @@ if (email && password) {
             req.session.rol = results[0].rol
             req.session.sexo = results[0].sexo
             req.session.c_identidad = results[0].C_Identidad
-            req.session.empresa_contratista = results[0].empresa_contratista
+            req.session.empresa_contratista = results[0].empresa
             console.log(req.session.loggedin, req.session.name, req.session.rol, req.session.c_identidad, req.session.empresa_contratista)
             res.render('login', {
                 login:false,
@@ -140,9 +140,18 @@ export const loginAuth = async (req, res, next)=> {
     if(req.session.rol == 2){
 
         //renderizar contratos para administradores
-        connection.query('SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, `id`, `ci_cliente`, `estatus_`, `id_cuenta`, `plan_contratado`, `direccion_contrato`, `motivo_standby`, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, `recursos_inventario_instalacion`, `observaciones_instalacion`, `contratista_asignado`, `telefono_cliente`, `nodo`, empresa_contratista FROM `contratos` ORDER BY fecha_contrato ASC', async (error, results, fields)=>{
+        connection.query('SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, `id`, `ci_cliente`, `estatus_`, `id_cuenta`, `plan_contratado`, `direccion_contrato`, `motivo_standby`, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, `recursos_inventario_instalacion`, `observaciones_instalacion`, `contratista_asignado`, `telefono_cliente`, `nodo`, empresa_contratista FROM `contratos` ORDER BY fecha_contrato ASC', async (error, results, fields)=>{
+
+
+            connection.query('SELECT * FROM contratistas', async (error,results,fields)=>{
+                let contratistas = results
+                console.log(contratistas)
+            })
+           
             if (req.session.loggedin) {
                 if( results != undefined){
+
+                
                         let contrat = [results]
                         console.log(contrat[0])
                         await res.render('index',{
@@ -163,12 +172,17 @@ export const loginAuth = async (req, res, next)=> {
                         console.log(req.session.loggedin)
                         await res.redirect('/');
                     }
+               
                     
              })
 
+             //Renderizar estadísticas del sistema
+
+
+
             }else if (req.session.rol == 1){
                 //renderizar contratos para administradores contratistas
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos WHERE empresa_contratista = ${req.session.empresa_contratista} ORDER BY fecha_contrato ASC `, async (error, results, fields)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos WHERE empresa_contratista = ${req.session.empresa_contratista} ORDER BY fecha_contrato ASC `, async (error, results, fields)=>{
             if (req.session.loggedin) {
                 if( results != undefined){
                         req.dashboard = results[0]
@@ -198,7 +212,7 @@ export const loginAuth = async (req, res, next)=> {
 
     //renderizar contratos para contratistas
     }else if (req.session.rol == 0){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo FROM contratos WHERE contratista_asignado = ${req.session.c_identidad} AND empresa_contratista =${req.session.empresa_contratista} ORDER BY fecha_contrato DESC`, async (error, results, fields)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo FROM contratos WHERE contratista_asignado = ${req.session.c_identidad} AND empresa_contratista =${req.session.empresa_contratista} ORDER BY fecha_contrato ASC`, async (error, results, fields)=>{
         if( error){
                 console.log(error)
             
@@ -234,11 +248,50 @@ export const loginEditContratistaAuth = async (req, res, next)=> {
         if (req.session.rol == 2) {
         //renderizar contratos para administradores
         connection.query('SELECT * FROM `contratistas`', async (error, results, fields)=>{
+            for (let index = 0; index < results.length; index++) {
+                var id_contratista = results
+               
+                console.log(results[index].C_Identidad)
+            }
+            console.log(id_contratista.C_Identidad)
+            console.log(id_contratista.length)
+
+           
+
+           
+            for (let index = 0; index < id_contratista.length; index++) {
+
+                 //Actualizar datos 
+                connection.query(`SELECT c.estatus_, c.id, c.empresa_contratista, c.contratista_asignado, DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, ct.C_Identidad, ct.empresa FROM contratos AS c INNER JOIN contratistas AS ct ON c.contratista_asignado = ct.C_Identidad WHERE c.contratista_asignado = ${id_contratista[index].C_Identidad}`, async (error, results) =>{
+                    if(error){
+                console.log(error)
+                    }else{
+                 let stats =results
+           
+
+            // console.log(stats)
+
+                let agendados = results.filter(result => result.estatus_ === 0)
+                let instalados = results.filter(result => result.estatus_ === 1)
+                console.log(`cantidad de contratos agendados del usuario  ${id_contratista[index].C_Identidad}  es ${agendados.length}`)
+                console.log(`cantidad de contratos instalados del usuario  ${id_contratista[index].C_Identidad}  es ${instalados.length}`)
+
+                connection.query(`UPDATE contratistas SET contratos_pendientes = ${agendados.length},
+                 contratos_instalados = ${instalados.length}
+                  WHERE C_Identidad = ${id_contratista[index].C_Identidad}`, async (error, results)=>{
+                    if(error){
+                        console.log(error)
+                    }else{
+                        console.log(results)
+                    }
+
+                    }) 
+                    }
+            })
+            }
            
                 if( results != undefined){
                         let contrat = [results]
-                        console.log (contrat[0])
-                        console.log(req.session.loggedin)
                         await res.render('contratistas_listview',{
                             estatus_: '',
                             login: true,
@@ -257,7 +310,7 @@ export const loginEditContratistaAuth = async (req, res, next)=> {
                     }else if (req.session.loggedin == 1){
 
 
-                        connection.query('SELECT * FROM `contratistas` WHERE empresa_contratista = ?' ,[req.session.empresa_contratista], async (error, results, fields)=>{
+                        connection.query('SELECT * FROM `contratistas` WHERE empresa = ?' ,[req.session.empresa_contratista], async (error, results, fields)=>{
            
                             if( results != undefined){
                                     let contrat = [results]
@@ -594,7 +647,7 @@ export const registerMethod = async (req, res)=>{
                             ruta: 'register'   })
                     } else {
                         let passwordHash = await bcrypt.hash(pass, 8);  
-                connection.query('INSERT INTO contratistas SET ?',{n_telefono:n_telefono, email:email, c_identidad:c_identidad, Nombres:nombres, Apellidos:apellidos, empresa_contratista:empresa_contratista, contraseña:passwordHash, sexo:sexo}, async (error,results) =>{ res.render('register_contratistas', {
+                connection.query('INSERT INTO contratistas SET ?',{n_telefono:n_telefono, email:email, c_identidad:c_identidad, Nombres:nombres, Apellidos:apellidos, empresa:empresa_contratista, contraseña:passwordHash, sexo:sexo}, async (error,results) =>{ res.render('register_contratistas', {
                     login: true,
                     rol:true,
                     alert: true,
@@ -686,7 +739,7 @@ export const loadContratista = async (req,res)=>{
 //Método para subir nuevos contratos individualmente a la DB
 export const uploadContratMethod =  async (req,res)=>{
 
-const id  = req.body.id                                    
+const id  = req.body.id              
 const fecha_contrato  = req.body.fecha_contrato
 const estatus_  = req.body.estatus_
 const id_cuenta  = req.body.id_cuenta
@@ -961,7 +1014,7 @@ export const updateContratMethod = async (req,res)=>{
                     alertIcon:'error',
                     showConfirmButton: true,
                     timer: '',
-                    ruta: `update-contrato/${id_contrato}`
+                    ruta: `/update-contrato/${id_contrato}`
                 });
         
             }else{
@@ -1131,23 +1184,29 @@ export const updateContratMethod = async (req,res)=>{
                                     observaciones_instalacion='${observaciones_instalacion}',
                                     telefono_cliente='${telefono_cliente}',
                                     contratista_asignado='${contratista_asignado}',
-                                    nodo='${nodo}' WHERE id = '${id_contrato}'` ,async (error,results, fields) =>{ res.render('updateContrato', {
-                                    login: true,
-                                    rol: req.session.rol,
-                                    alert: true,
-                                    contratos: contrat,
-                                    id_contrat:req.session.c_identidad,
-                                    empresa_contratista:req.session.empresa_contratista,
-                                    alertTitle: "Registration",
-                                    alertMessage: "¡Actualización Correcta!",
-                                    alertIcon:'success',
-                                    showConfirmButton: '',
-                                    timer: 1500,
-                                    ruta: 'index'
-                                
-                                    }
-                                )
-                                if (error){console.log(error)} else {console.log(results)}
+                                    nodo='${nodo}' WHERE id = '${id_contrato}'` ,async (error,results, fields) =>{ 
+                                    
+                                if (error){
+                                    console.log(error)
+                                } else {
+                                    console.log(results)
+                                    res.render('updateContrato', {
+                                        login: true,
+                                        rol: req.session.rol,
+                                        alert: true,
+                                        contratos: contrat,
+                                        id_contrat:req.session.c_identidad,
+                                        empresa_contratista:req.session.empresa_contratista,
+                                        alertTitle: "Registration",
+                                        alertMessage: "¡Actualización Correcta!",
+                                        alertIcon:'success',
+                                        showConfirmButton: '',
+                                        timer: 1500,
+                                        ruta: 'index'
+                                    
+                                        }
+                                    )
+                                }
                             }
                         )
                                     }
@@ -1398,7 +1457,7 @@ export const updateContratistaMethod = async (req,res)=>{
                             sexo='${sexo}',
                             Nombres='${Nombres}',
                             Apellidos='${Apellidos}',
-                            empresa_contratista='${empresa_contratista}'
+                            empresa='${empresa_contratista}'
                             WHERE C_Identidad = '${id_contratista}'` , async (error,results) =>{
                                 if(error){
                                     console.log(error)}else{
@@ -1514,7 +1573,7 @@ export const filtroContratos = async (req,res)=>{
     console.log(instalador)
     //combinación de 6
      if(desde_fecha&& hasta_fecha && id_contrato&& estatus_ && empresa_contratista && instalador && nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -1545,7 +1604,7 @@ export const filtroContratos = async (req,res)=>{
 // combinación de 5
     /*1*/ }else if(instalador && empresa_contratista && estatus_ && id_contrato && desde_fecha && hasta_fecha) {
     
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -1574,8 +1633,8 @@ export const filtroContratos = async (req,res)=>{
         })
     
     /*2*/ }else if(instalador && empresa_contratista && estatus_ && id_contrato && nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
-            if(error){
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        if(error){
                 console.log(error)
             }else{
                 if(req.session.loggedin){
@@ -1602,7 +1661,7 @@ export const filtroContratos = async (req,res)=>{
         }
         })
     /*3*/ }else if(desde_fecha&& hasta_fecha && estatus_ && empresa_contratista && instalador && nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -1630,7 +1689,7 @@ export const filtroContratos = async (req,res)=>{
         }
         })
     /*4*/ }else if(desde_fecha&& hasta_fecha && id_contrato&& empresa_contratista && instalador && nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -1659,7 +1718,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*5*/ }else if(desde_fecha&& hasta_fecha && id_contrato&& estatus_ && instalador && nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -1689,7 +1748,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*6*/ }else if(desde_fecha&& hasta_fecha && id_contrato&& estatus_ && empresa_contratista && nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND nodo LIKE '${nodo}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND nodo LIKE '${nodo}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -1720,7 +1779,7 @@ export const filtroContratos = async (req,res)=>{
         //Combinaciones de 4
 
     /*1*/ }else if(instalador && empresa_contratista && estatus_ && id_contrato){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -1749,7 +1808,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*2*/ }else if(instalador&& empresa_contratista& estatus_&& desde_fecha&& hasta_fecha){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista}  AND contratista_asignado LIKE '${instalador}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista}  AND contratista_asignado LIKE '${instalador}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -1779,7 +1838,7 @@ export const filtroContratos = async (req,res)=>{
 
             
     /*3*/ }else if(instalador&& empresa_contratista&& estatus_&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista}  AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista}  AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -1808,7 +1867,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*4*/ }else if(instalador&& empresa_contratista&& id_contrato&& desde_fecha&& hasta_fecha){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -1837,7 +1896,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*5*/ }else if(instalador&& empresa_contratista&& id_contrato&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -1866,7 +1925,7 @@ export const filtroContratos = async (req,res)=>{
         })
         
     /*6*/ }else if(instalador&&empresa_contratista&& desde_fecha&& hasta_fecha&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  empresa_contratista = ${empresa_contratista}  AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  empresa_contratista = ${empresa_contratista}  AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -1895,7 +1954,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*7*/ }else if(instalador&& estatus_&& id_contrato&& desde_fecha&& hasta_fecha){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -1924,7 +1983,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*8*/ }else if(instalador&& estatus_&& id_contrato&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_}  AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_}  AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -1953,7 +2012,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*9*/ }else if(instalador&& estatus_&& desde_fecha&& hasta_fecha&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_}  AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_}  AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -1982,7 +2041,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*10*/}else if(instalador&& id_contrato&& desde_fecha&& hasta_fecha&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2011,7 +2070,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*11*/}else if(empresa_contratista&& estatus_&& id_contrato&& desde_fecha&& hasta_fecha){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2040,7 +2099,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*12*/}else if(empresa_contratista&& estatus_&& id_contrato&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND nodo LIKE '${nodo}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND nodo LIKE '${nodo}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2069,7 +2128,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*13*/}else if(empresa_contratista&& estatus_&& desde_fecha&& hasta_fecha&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND nodo LIKE '${nodo}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND nodo LIKE '${nodo}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2098,7 +2157,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*14*/}else if(empresa_contratista&& id_contrato&& desde_fecha&& hasta_fecha&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND nodo LIKE '${nodo}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND nodo LIKE '${nodo}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2127,7 +2186,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*15*/}else if(estatus_&& id_contrato&& desde_fecha&& hasta_fecha&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND id like '${id_contrato}%'AND nodo LIKE '${nodo}%' AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND id like '${id_contrato}%'AND nodo LIKE '${nodo}%' AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2157,7 +2216,7 @@ export const filtroContratos = async (req,res)=>{
 
         //combinaciones de 3
     /*1*/  }else if(instalador&& empresa_contratista&& estatus_){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista}  AND contratista_asignado LIKE '${instalador}% ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista}  AND contratista_asignado LIKE '${instalador}% ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2186,7 +2245,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*2*/  }else if(instalador&& empresa_contratista&& id_contrato){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2215,7 +2274,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*3*/  }else if(instalador&& empresa_contratista&& desde_fecha&& hasta_fecha){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE empresa_contratista = ${empresa_contratista}AND contratista_asignado LIKE '${instalador}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE empresa_contratista = ${empresa_contratista}AND contratista_asignado LIKE '${instalador}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2244,7 +2303,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*4*/  }else if(instalador&& empresa_contratista&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE empresa_contratista = ${empresa_contratista} AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%'  ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE empresa_contratista = ${empresa_contratista} AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%'  ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2273,7 +2332,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*5*/  }else if(instalador&& estatus_&& id_contrato){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND id like '${id_contrato}%'  AND contratista_asignado LIKE '${instalador}%' AND (empresa_contratista = ${empresa_contratista_})  ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND id like '${id_contrato}%'  AND contratista_asignado LIKE '${instalador}%' AND (empresa_contratista = ${empresa_contratista_})  ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2302,7 +2361,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*6*/  }else if(instalador&& estatus_ && desde_fecha&& hasta_fecha){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND contratista_asignado LIKE '${instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND contratista_asignado LIKE '${instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2331,7 +2390,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*7*/  }else if(instalador&& estatus_&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND contratista_asignado LIKE '${instalador}%' AND nodo LIKE '${nodo}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND contratista_asignado LIKE '${instalador}%' AND nodo LIKE '${nodo}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2360,7 +2419,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*8*/  }else if(instalador&& id_contrato && desde_fecha&& hasta_fecha){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE   id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE   id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2389,7 +2448,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*9*/  }else if(instalador&& id_contrato&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2418,7 +2477,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*10*/  }else if(instalador&& desde_fecha&& hasta_fecha&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2447,7 +2506,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*11*/  }else if(empresa_contratista&& estatus_&& id_contrato){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2477,7 +2536,7 @@ export const filtroContratos = async (req,res)=>{
 
     /*12*/  }else if(empresa_contratista&& estatus_ && desde_fecha&& hasta_fecha){
 
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2505,7 +2564,7 @@ export const filtroContratos = async (req,res)=>{
         }
         })
     /*13*/  }else if(empresa_contratista&& estatus_&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} 'AND nodo LIKE '${nodo}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} 'AND nodo LIKE '${nodo}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2534,7 +2593,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*14*/  }else if(empresa_contratista&& id_contrato&& desde_fecha&& hasta_fecha){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2563,7 +2622,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*15*/  }else if(empresa_contratista&& id_contrato&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' 'AND nodo LIKE '${nodo}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' 'AND nodo LIKE '${nodo}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2592,7 +2651,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*16*/  }else if(empresa_contratista && desde_fecha&& hasta_fecha&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE empresa_contratista = ${empresa_contratista} AND nodo LIKE '${nodo}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE empresa_contratista = ${empresa_contratista} AND nodo LIKE '${nodo}%' AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2622,7 +2681,7 @@ export const filtroContratos = async (req,res)=>{
 
     /*17*/  }else if(estatus_&& id_contrato && desde_fecha&& hasta_fecha){
 
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND id like '${id_contrato}%'  AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND id like '${id_contrato}%'  AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2650,7 +2709,7 @@ export const filtroContratos = async (req,res)=>{
         }
         })
     /*18*/  }else if(estatus_&& id_contrato&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_}  AND id like '${id_contrato}%' AND nodo LIKE '${nodo}%' AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_}  AND id like '${id_contrato}%' AND nodo LIKE '${nodo}%' AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2679,7 +2738,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*19*/ }else if(estatus_&& desde_fecha&& hasta_fecha&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND nodo LIKE '${nodo}%' AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND nodo LIKE '${nodo}%' AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2708,7 +2767,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*20*/ }else if(id_contrato && desde_fecha&& hasta_fecha&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2740,7 +2799,7 @@ export const filtroContratos = async (req,res)=>{
 
           //combinaciones de 2
     /*1*/ }else if(instalador&& empresa_contratista){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE empresa_contratista = ${empresa_contratista} AND contratista_asignado LIKE '${instalador}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE empresa_contratista = ${empresa_contratista} AND contratista_asignado LIKE '${instalador}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2769,7 +2828,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*2*/ }else if(instalador&& estatus_){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND contratista_asignado LIKE '${instalador}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND contratista_asignado LIKE '${instalador}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2798,7 +2857,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*3*/ }else if(instalador&& id_contrato){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE id like '${id_contrato}%' AND contratista_asignado LIKE '${instalador}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2827,7 +2886,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*4*/ }else if(instalador&& desde_fecha&& hasta_fecha){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE contratista_asignado LIKE '${instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE contratista_asignado LIKE '${instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2856,7 +2915,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*5*/ }else if(instalador&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE contratista_asignado LIKE '${instalador}%'AND nodo LIKE '${nodo}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2885,7 +2944,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*6*/ }else if(empresa_contratista&& estatus_){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND empresa_contratista = ${empresa_contratista} ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2914,7 +2973,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*7*/ }else if(empresa_contratista&& id_contrato){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE empresa_contratista = ${empresa_contratista} AND id like '${id_contrato}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2943,7 +3002,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*8*/ }else if(empresa_contratista && desde_fecha&& hasta_fecha){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE empresa_contratista = ${empresa_contratista} AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE empresa_contratista = ${empresa_contratista} AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -2972,7 +3031,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*9*/ }else if(empresa_contratista&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE empresa_contratista = ${empresa_contratista} AND nodo LIKE '${nodo}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE empresa_contratista = ${empresa_contratista} AND nodo LIKE '${nodo}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -3001,7 +3060,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*10*/ }else if(estatus_&& id_contrato){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND id like '${id_contrato}%' AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -3030,7 +3089,7 @@ export const filtroContratos = async (req,res)=>{
         })
         
     /*11*/ }else if(estatus_&& desde_fecha&& hasta_fecha){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -3059,7 +3118,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*12*/ }else if(estatus_&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND contratista_asignado LIKE '${id_instalador}%' AND nodo LIKE '${nodo}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE  estatus_ = ${estatus_} AND contratista_asignado LIKE '${id_instalador}%' AND nodo LIKE '${nodo}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -3088,7 +3147,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*13*/ }else if(id_contrato&& desde_fecha&& hasta_fecha){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE id like '${id_contrato}%' AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE id like '${id_contrato}%' AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -3117,7 +3176,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*14*/ }else if(id_contrato&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE id like '${id_contrato}%' AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND nodo LIKE '${nodo}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE id like '${id_contrato}%' AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND nodo LIKE '${nodo}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -3146,7 +3205,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     /*15*/ }else if(desde_fecha&& hasta_fecha&& nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE nodo LIKE '${nodo}%' AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE nodo LIKE '${nodo}%' AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) AND (fecha_contrato between '${desde_fecha}' AND '${hasta_fecha}') ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -3178,7 +3237,7 @@ export const filtroContratos = async (req,res)=>{
 
         //combinaciones únicas
     }else if(nodo){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE nodo LIKE '${nodo}%' AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE nodo LIKE '${nodo}%' AND contratista_asignado LIKE '${id_instalador}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
     
@@ -3208,7 +3267,7 @@ export const filtroContratos = async (req,res)=>{
         }
         })
     }else if (instalador){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE contratista_asignado LIKE '${instalador}%'  AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC `, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE contratista_asignado LIKE '${instalador}%'  AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC `, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -3237,7 +3296,7 @@ export const filtroContratos = async (req,res)=>{
         })
 
     }else if(desde_fecha && hasta_fecha){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE (fecha_contrato between '${desde_fecha}' and '${hasta_fecha}') AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE (fecha_contrato between '${desde_fecha}' and '${hasta_fecha}') AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
             }else{
@@ -3267,7 +3326,7 @@ export const filtroContratos = async (req,res)=>{
     
 
     }else if(id_contrato){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE id like '${id_contrato}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE id like '${id_contrato}%' AND (empresa_contratista = ${empresa_contratista_}) ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
     
@@ -3300,7 +3359,7 @@ export const filtroContratos = async (req,res)=>{
     
 
     }else if (empresa_contratista === '1' || empresa_contratista === '0'){
-        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE empresa_contratista = ${empresa_contratista} AND contratista_asignado LIKE '${id_instalador}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
+        connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE empresa_contratista = ${empresa_contratista} AND contratista_asignado LIKE '${id_instalador}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
             if(error){
                 console.log(error)
     
@@ -3333,7 +3392,7 @@ export const filtroContratos = async (req,res)=>{
 
     }else if (estatus_=== '2' || estatus_ === '1' || estatus_=== '0'){
 
-    connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%d/%m/%Y") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%d/%m/%Y") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE estatus_ = ${estatus_} AND (empresa_contratista = ${empresa_contratista_}) AND contratista_asignado LIKE '${id_instalador}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
+    connection.query(`SELECT DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, id, ci_cliente, estatus_, id_cuenta, plan_contratado, direccion_contrato, motivo_standby, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, recursos_inventario_instalacion, observaciones_instalacion, contratista_asignado, telefono_cliente, nodo, empresa_contratista FROM contratos  WHERE estatus_ = ${estatus_} AND (empresa_contratista = ${empresa_contratista_}) AND contratista_asignado LIKE '${id_instalador}%' ORDER BY fecha_contrato ASC`, async(error,results)=>{
         if(error){
             console.log(error)
 
