@@ -242,7 +242,7 @@ export const loginAuth = async (req, res, next)=> {
 }
 };
 
-export const loginEditContratistaAuth = async (req, res, next)=> {
+export const loginContratistaAuth = async (req, res, next)=> {
 
     if(req.session.loggedin){
         if (req.session.rol == 2) {
@@ -702,34 +702,81 @@ export const loadContrat = async (req,res)=>{
 //Método para requerir los datos de los contratistas individuales de la DB
 export const loadContratista = async (req,res)=>{
     const id_contratista = req.params.id
+
     if (req.session.loggedin){
-    connection.query ('SELECT * FROM contratistas WHERE C_Identidad = ? ', [id_contratista], async (error, results, fields)=>{
-        if (req.session.rol) {
-            if( results != undefined){
-                    let contrat = [results]
-                    console.log (req.session.c_identidad, contrat)
-                    console.log(req.session.loggedin)
-                    await res.render('contratistas_fullview',{
-                        login: true,
-                        name: req.session.name,
-                        rol: req.session.rol,
-                        id_contrat:req.session.c_identidad,
-                        sexo: req.session.sexo,
-                        contratos: contrat,
-                    }
-                )
-                
-                } else {
-                    console.log('no hay datos') 
-                                    
-                }
-                
-                 }else{
-                    console.log(req.session.loggedin)
-                    await res.redirect('/index');
-                }
+        connection.query(`SELECT ct.C_Identidad, ct.contratos_pendientes, ct.inventario, ct.empresa, ct.Nombres, ct.Apellidos, ct.email, ct.n_telefono, ct.rol, ct.sexo, ct.contratos_instalados, DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, c.id, c.contratista_asignado, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion FROM contratistas AS ct INNER JOIN contratos AS c ON ct.C_Identidad = c.contratista_asignado WHERE ct.C_Identidad = ${id_contratista} `, async (error, results)=>{
+            if(results == 0){
+                connection.query(`SELECT * FROM contratistas WHERE C_Identidad = ${id_contratista}`, async(error, results)=>{
+
+                    if (req.session.rol) {
+                        if(error){
+                            console.log (error)
+                        
+                        }else if( results != undefined){
+                                let contrat = [results]
+                                console.log (contrat)
+                                console.log(req.session.loggedin)
+                                await res.render('contratistas_fullview',{
+                                    login: true,
+                                    name: req.session.name,
+                                    rol: req.session.rol,
+                                    id_contrat:req.session.c_identidad,
+                                    sexo: req.session.sexo,
+                                    contratos: contrat,
+                                }
+                            )
             
-    })
+                            if(results == 0){
+                                console.log ('los resultados son falsos')}
+                            
+                            } else {
+                                console.log('no hay datos') 
+                                                
+                            }
+                            
+                             }else{
+                                console.log(req.session.loggedin)
+                                await res.redirect('/index');
+                            }
+
+                })
+
+            }else{
+                connection.query (`SELECT ct.C_Identidad, ct.contratos_pendientes, ct.inventario, ct.empresa, ct.Nombres, ct.Apellidos, ct.email, ct.n_telefono, ct.rol, ct.sexo, ct.contratos_instalados, DATE_FORMAT(fecha_contrato, "%Y-%m-%d") AS fecha_contrato, c.id, c.contratista_asignado, DATE_FORMAT(fecha_instalacion, "%Y-%m-%d") AS fecha_instalacion, c.estatus_ FROM contratistas AS ct INNER JOIN contratos AS c ON ct.C_Identidad = c.contratista_asignado WHERE ct.C_Identidad = ${id_contratista} ORDER BY fecha_contrato DESC`, async (error, results, fields)=>{
+                    if (req.session.rol) {
+                        if(error){
+                            console.log (error)
+                        
+                        }else if( results != undefined){
+                                let contrat = [results]
+                                console.log (contrat)
+                                console.log(req.session.loggedin)
+                                await res.render('contratistas_fullview',{
+                                    login: true,
+                                    name: req.session.name,
+                                    rol: req.session.rol,
+                                    id_contrat:req.session.c_identidad,
+                                    sexo: req.session.sexo,
+                                    contratos: contrat,
+                                }
+                            )
+
+                            
+                            } else {
+                                console.log('no hay datos') 
+                                                
+                            }
+                            
+                             }else{
+                                console.log(req.session.loggedin)
+                                await res.redirect('/index');
+                            }
+                        
+                })
+            }
+        })
+
+   
     }else{
         await res.redirect('/')
     }
@@ -1534,7 +1581,8 @@ export const deleteContratista = async (req,res) =>{
             const id_contrato = req.params.id
 
             if (req.session.loggedin && req.session.rol){
-            connection.query('DELETE FROM contratistas WHERE C_Identidad = ?',[id_contrato], (error, results)=>{
+                connection.query(`UPDATE contratistas SET C_Identidad = 0 WHERE C_identidad = ${id_contrato} `)
+            connection.query('DELETE FROM contratistas WHERE C_Identidad = ?',[id_contrato], async (error, results)=>{
                 if(error){
                     console.log(error);
                 }else{           
@@ -3429,6 +3477,498 @@ export const filtroContratos = async (req,res)=>{
 //     res.redirect('/index')
 // }
 }
+
+export const filtroContratistas = async (req,res)=>{
+    const C_Identidad = req.body.C_Identidad
+    const empresa_contratista = req.body.empresa
+    const Nombres = req.body.Nombres
+    const Apellidos = req.body.Apellidos
+    let empresa_contratista_= '0 OR 1'
+    if(req.session.rol == 1){
+        empresa_contratista_ = req.session.empresa_contratista
+    }
+    //combinacion de 4
+    if(C_Identidad && empresa_contratista && Nombres && Apellidos){
+        connection.query(`SELECT * FROM contratistas WHERE C_Identidad LIKE '${C_Identidad}%' AND empresa = ${empresa_contratista} AND Nombres LIKE '%${Nombres}%'AND Apellidos LIKE '%${Apellidos}%'`, async(error, results)=>{
+            if(error){
+                console.log(error)
+            }else{
+                if(req.session.loggedin){
+                if( results != undefined){
+                    let contrat = [results]
+                    console.log (contrat)
+                    console.log(req.session.loggedin)
+                    await res.render('contratistas_listview',{
+                        estatus: false,
+                        login: req.session.loggedin,
+                        name: req.session.name,
+                        rol: req.session.rol,
+                        sexo: req.session.sexo,
+                        contratistas: contrat
+                    }
+                );
+                } else {
+                    console.log('no hay datos') 
+                                    
+                }
+            }else{
+                res.redirect('/')
+            }
+        }
+        })
+        //combinación de 3
+/*1*/    }else if (C_Identidad&& Nombres&& empresa_contratista){
+        connection.query(`SELECT * FROM contratistas WHERE C_Identidad LIKE '${C_Identidad}%' AND empresa = ${empresa_contratista} AND Nombres LIKE '%${Nombres}%'`, async(error, results)=>{
+            if(error){
+                console.log(error)
+            }else{
+                if(req.session.loggedin){
+                if( results != undefined){
+                    let contrat = [results]
+                    console.log (contrat)
+                    console.log(req.session.loggedin)
+                    await res.render('contratistas_listview',{
+                        estatus: false,
+                        login: req.session.loggedin,
+                        name: req.session.name,
+                        rol: req.session.rol,
+                        sexo: req.session.sexo,
+                        contratistas: contrat
+                    }
+                );
+                } else {
+                    console.log('no hay datos') 
+                                    
+                }
+            }else{
+                res.redirect('/')
+            }
+        }
+        })
+
+/*2*/    }else if (C_Identidad&& Nombres&& Apellidos){
+        connection.query(`SELECT * FROM contratistas WHERE C_Identidad LIKE '${C_Identidad}%' AND (empresa_contratista = ${empresa_contratista_}) AND Nombres LIKE '%${Nombres}%'AND Apellidos LIKE '%${Apellidos}%'`, async(error, results)=>{
+            if(error){
+                console.log(error)
+            }else{
+                if(req.session.loggedin){
+                if( results != undefined){
+                    let contrat = [results]
+                    console.log (contrat)
+                    console.log(req.session.loggedin)
+                    await res.render('contratistas_listview',{
+                        estatus: false,
+                        login: req.session.loggedin,
+                        name: req.session.name,
+                        rol: req.session.rol,
+                        sexo: req.session.sexo,
+                        contratistas: contrat
+                    }
+                );
+                } else {
+                    console.log('no hay datos') 
+                                    
+                }
+            }else{
+                res.redirect('/')
+            }
+        }
+        })
+
+/*3*/    }else if (C_Identidad&& empresa_contratista&& Apellidos){
+        connection.query(`SELECT * FROM contratistas WHERE C_Identidad LIKE '${C_Identidad}%' AND empresa = ${empresa_contratista} AND Apellidos LIKE '%${Apellidos}%'`, async(error, results)=>{
+            if(error){
+                console.log(error)
+            }else{
+                if(req.session.loggedin){
+                if( results != undefined){
+                    let contrat = [results]
+                    console.log (contrat)
+                    console.log(req.session.loggedin)
+                    await res.render('contratistas_listview',{
+                        estatus: false,
+                        login: req.session.loggedin,
+                        name: req.session.name,
+                        rol: req.session.rol,
+                        sexo: req.session.sexo,
+                        contratistas: contrat
+                    }
+                );
+                } else {
+                    console.log('no hay datos') 
+                                    
+                }
+            }else{
+                res.redirect('/')
+            }
+        }
+        })
+
+/*4*/    }else if (Nombres&& empresa_contratista&& Apellidos){
+
+            connection.query(`SELECT * FROM contratistas WHERE empresa = ${empresa_contratista} AND Nombres LIKE '%${Nombres}%' AND Apellidos LIKE '%${Apellidos}%'`, async(error, results)=>{
+                if(error){
+                    console.log(error)
+                }else{
+                    if(req.session.loggedin){
+                    if( results != undefined){
+                        let contrat = [results]
+                        console.log (contrat)
+                        console.log(req.session.loggedin)
+                        await res.render('contratistas_listview',{
+                            estatus: false,
+                            login: req.session.loggedin,
+                            name: req.session.name,
+                            rol: req.session.rol,
+                            sexo: req.session.sexo,
+                            contratistas: contrat
+                        }
+                    );
+                    } else {
+                        console.log('no hay datos') 
+                                        
+                    }
+                }else{
+                    res.redirect('/')
+                }
+            }
+            })
+        
+
+           
+
+
+/*1*/    }else if(C_Identidad&& Nombres){
+            connection.query(`SELECT * FROM contratistas WHERE C_Identidad LIKE '${C_Identidad}%' AND (empresa = ${empresa_contratista_}) AND Nombres LIKE '%${Nombres}%'`, async(error, results)=>{
+                if(error){
+                    console.log(error)
+                }else{
+                    if(req.session.loggedin){
+                    if( results != undefined){
+                        let contrat = [results]
+                        console.log (contrat)
+                        console.log(req.session.loggedin)
+                        await res.render('contratistas_listview',{
+                            estatus: false,
+                            login: req.session.loggedin,
+                            name: req.session.name,
+                            rol: req.session.rol,
+                            sexo: req.session.sexo,
+                            contratistas: contrat
+                        }
+                    );
+                    } else {
+                        console.log('no hay datos') 
+                                        
+                    }
+                }else{
+                    res.redirect('/')
+                }
+            }
+            })
+            
+/*2*/    }else if(C_Identidad && empresa_contratista ){
+    connection.query(`SELECT * FROM contratistas WHERE C_Identidad LIKE '${C_Identidad}%' AND empresa = ${empresa_contratista}`, async(error, results)=>{
+        if(error){
+            console.log(error)
+        }else{
+            if(req.session.loggedin){
+            if( results != undefined){
+                let contrat = [results]
+                console.log (contrat)
+                console.log(req.session.loggedin)
+                await res.render('contratistas_listview',{
+                    estatus: false,
+                    login: req.session.loggedin,
+                    name: req.session.name,
+                    rol: req.session.rol,
+                    sexo: req.session.sexo,
+                    contratistas: contrat
+                }
+            );
+            } else {
+                console.log('no hay datos') 
+                                
+            }
+
+/*3*/    }else if(C_Identidad && empresa_contratista && Nombres && Apellidos){
+    connection.query(`SELECT * FROM contratistas WHERE C_Identidad LIKE '${C_Identidad}%' AND empresa = ${empresa_contratista} AND Nombres LIKE '%${Nombres}%'AND Apellidos LIKE '%${Apellidos}%'`, async(error, results)=>{
+        if(error){
+            console.log(error)
+        }else{
+            if(req.session.loggedin){
+            if( results != undefined){
+                let contrat = [results]
+                console.log (contrat)
+                console.log(req.session.loggedin)
+                await res.render('contratistas_listview',{
+                    estatus: false,
+                    login: req.session.loggedin,
+                    name: req.session.name,
+                    rol: req.session.rol,
+                    sexo: req.session.sexo,
+                    contratistas: contrat
+                }
+            );
+            } else {
+                console.log('no hay datos') 
+                                
+            }
+        }else{
+            res.redirect('/')
+        }
+    }
+    })
+                
+        }else{
+            res.redirect('/')
+        }
+    }
+    })
+
+/*3*/    }else if(C_Identidad&& Apellidos){
+    connection.query(`SELECT * FROM contratistas WHERE C_Identidad LIKE '${C_Identidad}%' AND (empresa = ${empresa_contratista_}) AND Apellidos LIKE '%${Apellidos}%'`, async(error, results)=>{
+        if(error){
+            console.log(error)
+        }else{
+            if(req.session.loggedin){
+            if( results != undefined){
+                let contrat = [results]
+                console.log (contrat)
+                console.log(req.session.loggedin)
+                await res.render('contratistas_listview',{
+                    estatus: false,
+                    login: req.session.loggedin,
+                    name: req.session.name,
+                    rol: req.session.rol,
+                    sexo: req.session.sexo,
+                    contratistas: contrat
+                }
+            );
+            } else {
+                console.log('no hay datos') 
+                                
+            }
+        }else{
+            res.redirect('/')
+        }
+    }
+    })
+        
+/*4*/    }else if(empresa_contratista && Nombres){
+    connection.query(`SELECT * FROM contratistas WHERE empresa = ${empresa_contratista} AND Nombres LIKE '%${Nombres}%'`, async(error, results)=>{
+        if(error){
+            console.log(error)
+        }else{
+            if(req.session.loggedin){
+            if( results != undefined){
+                let contrat = [results]
+                console.log (contrat)
+                console.log(req.session.loggedin)
+                await res.render('contratistas_listview',{
+                    estatus: false,
+                    login: req.session.loggedin,
+                    name: req.session.name,
+                    rol: req.session.rol,
+                    sexo: req.session.sexo,
+                    contratistas: contrat
+                }
+            );
+            } else {
+                console.log('no hay datos') 
+                                
+            }
+        }else{
+            res.redirect('/')
+        }
+    }
+    })
+    
+/*5*/    }else if(Nombres && Apellidos){
+    connection.query(`SELECT * FROM contratistas WHERE Nombres LIKE '%${Nombres}%' AND (empresa = ${empresa_contratista_}) AND  Apellidos LIKE '%${Apellidos}%'`, async(error, results)=>{
+        if(error){
+            console.log(error)
+        }else{
+            if(req.session.loggedin){
+            if( results != undefined){
+                let contrat = [results]
+                console.log (contrat)
+                console.log(req.session.loggedin)
+                await res.render('contratistas_listview',{
+                    estatus: false,
+                    login: req.session.loggedin,
+                    name: req.session.name,
+                    rol: req.session.rol,
+                    sexo: req.session.sexo,
+                    contratistas: contrat
+                }
+            );
+            } else {
+                console.log('no hay datos') 
+                                
+            }
+        }else{
+            res.redirect('/')
+        }
+    }
+    })
+
+/*6*/    }else if(empresa_contratista && Apellidos){
+            connection.query(`SELECT * FROM contratistas WHERE AND empresa = ${empresa_contratista} AND Nombres LIKE '%${Nombres}%'AND Apellidos LIKE '%${Apellidos}%'`, async(error, results)=>{
+                if(error){
+                    console.log(error)
+                }else{
+                    if(req.session.loggedin){
+                    if( results != undefined){
+                        let contrat = [results]
+                        console.log (contrat)
+                        console.log(req.session.loggedin)
+                        await res.render('contratistas_listview',{
+                            estatus: false,
+                            login: req.session.loggedin,
+                            name: req.session.name,
+                            rol: req.session.rol,
+                            sexo: req.session.sexo,
+                            contratistas: contrat
+                        }
+                    );
+                    } else {
+                        console.log('no hay datos') 
+                                        
+                    }
+                }else{
+                    res.redirect('/')
+                }
+            }
+            })
+                
+/*1*/    }else if (C_Identidad){
+    connection.query(`SELECT * FROM contratistas WHERE C_Identidad LIKE '${C_Identidad}%' AND (empresa = ${empresa_contratista_})`, async(error, results)=>{
+        if(error){
+            console.log(error)
+        }else{
+            if(req.session.loggedin){
+            if( results != undefined){
+                let contrat = [results]
+                console.log (contrat)
+                console.log(req.session.loggedin)
+                await res.render('contratistas_listview',{
+                    estatus: false,
+                    login: req.session.loggedin,
+                    name: req.session.name,
+                    rol: req.session.rol,
+                    sexo: req.session.sexo,
+                    contratistas: contrat
+                }
+            );
+            } else {
+                console.log('no hay datos') 
+                                
+            }
+        }else{
+            res.redirect('/')
+        }
+    }
+    })          
+    
+    
+/*2*/    }else if (Nombres){
+    connection.query(`SELECT * FROM contratistas WHERE  Nombres LIKE '%${Nombres}%' AND (empresa = ${empresa_contratista_})`, async(error, results)=>{
+        if(error){
+            console.log(error)
+        }else{
+            if(req.session.loggedin){
+            if( results != undefined){
+                let contrat = [results]
+                console.log (contrat)
+                console.log(req.session.loggedin)
+                await res.render('contratistas_listview',{
+                    estatus: false,
+                    login: req.session.loggedin,
+                    name: req.session.name,
+                    rol: req.session.rol,
+                    sexo: req.session.sexo,
+                    contratistas: contrat
+                }
+            );
+            } else {
+                console.log('no hay datos') 
+                                
+            }
+        }else{
+            res.redirect('/')
+        }
+    }
+    })
+    
+/*3*/    }else if (empresa_contratista){
+    connection.query(`SELECT * FROM contratistas WHERE  empresa = ${empresa_contratista}`, async(error, results)=>{
+        if(error){
+            console.log(error)
+        }else{
+            if(req.session.loggedin){
+            if( results != undefined){
+                let contrat = [results]
+                console.log (contrat)
+                console.log(req.session.loggedin)
+                await res.render('contratistas_listview',{
+                    estatus: false,
+                    login: req.session.loggedin,
+                    name: req.session.name,
+                    rol: req.session.rol,
+                    sexo: req.session.sexo,
+                    contratistas: contrat
+                }
+            );
+            } else {
+                console.log('no hay datos') 
+                                
+            }
+        }else{
+            res.redirect('/')
+        }
+    }
+    })    
+
+
+/*4*/    }else if (Apellidos){
+    connection.query(`SELECT * FROM contratistas WHERE Apellidos LIKE '%${Apellidos}%' AND (empresa = ${empresa_contratista_})`, async(error, results)=>{
+        if(error){
+            console.log(error)
+        }else{
+            if(req.session.loggedin){
+            if( results != undefined){
+                let contrat = [results]
+                console.log (contrat)
+                console.log(req.session.loggedin)
+                await res.render('contratistas_listview',{
+                    estatus: false,
+                    login: req.session.loggedin,
+                    name: req.session.name,
+                    rol: req.session.rol,
+                    sexo: req.session.sexo,
+                    contratistas: contrat
+                }
+            );
+            } else {
+                console.log('no hay datos') 
+                                
+            }
+        }else{
+            res.redirect('/')
+        }
+    }
+    })
+            
+
+    }  else {
+        res.redirect('/contratista')
+    }
+
+}
+
+
+
 
 //función para limpiar la caché luego del logout
 app.use(function (req, res, next) {

@@ -37,21 +37,21 @@
                 </thead>
                 <% if (contratos[0] != undefined) {%>
                 <tbody>
-                <% for (let index = 0; index < contratos[0].length; index++) { %>
+
                     <tr >
-                        <td><%=contratos[0][index].C_Identidad %></td>
-                        <td><%=contratos[0][index].Nombres %></td>
-                        <td><%=contratos[0][index].Apellidos %></td>
-                        <%if (contratos[0][index].empresa) {%>
+                        <td><%=contratos[0][0].C_Identidad %></td>
+                        <td><%=contratos[0][0].Nombres %></td>
+                        <td><%=contratos[0][0].Apellidos %></td>
+                        <%if (contratos[0][0].empresa) {%>
                         <td>Servitel</td>
                         <% }else{ %>
                         <td>Hetelca</td>
                         <% } %>
-                        <td><%=contratos[0][index].contratos_pendientes %></td>
-                        <td><%=contratos[0][index].inventario %></td>
-                        <td><%=contratos[0][index].email %></td>
-                        <td><%=contratos[0][index].n_telefono %></td>
-                        <% if(contratos[0][index].sexo) {%>
+                        <td><%=contratos[0][0].contratos_pendientes %></td>
+                        <td><%=contratos[0][0].inventario %></td>
+                        <td><%=contratos[0][0].email %></td>
+                        <td><%=contratos[0][0].n_telefono %></td>
+                        <% if(contratos[0][0].sexo) {%>
                         <td>F</td>
                         <% }else{ %>
                         <td>M</td>
@@ -73,7 +73,7 @@
                 </script>
             </form>
         </div>
-                <% } %>
+               
                 
         <% }else{ %>
         <tbody>
@@ -87,6 +87,46 @@
   </div>
 
         <% } %>
+
+
+        <table id="lista-contratos" class="principal-table table-striped">
+                <thead> 
+                    <tr>
+                        <th>#</th>
+                        <th>Fecha contrato</th>
+                        <th>ID del contrato</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <% if (contratos[0] != undefined) {%>
+                <tbody id="contratos">
+                <% for (let index = 0; index < contratos[0].length; index++) { %>
+                    <tr id="tr<%=index %>"  >
+                        <td><%=index+1 %> </td>
+                        <td  id="fecha"><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].fecha_contrato %></a></td>
+                        <td id="id"><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].id %></a></td>
+                        <% if (contratos[0][index].estatus_ == 0){%>
+                            <td>Agendado</td>
+                            <% }else if (contratos[0][index].estatus_ == 1){ %>
+                                <td>Instalado</td>
+                            <% }else if(contratos[0][index].estatus_ == 2){ %>
+                                <td>Finalizado</td>
+                            <% } %>
+                    </tr> 
+                <% } %>
+                </tbody>
+            </table>
+          </div>
+        <% }else{ %>
+        <tbody>
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr> 
+        <% } %>
+        </tbody>
+    </table>
        
 
     </section>
@@ -182,9 +222,47 @@
             </table>
         </div>
             <% } %>
-            
-            
                     <% } %>
+
+                    <table id="lista-contratos" class="principal-table table-striped">
+                        <thead> 
+                            <tr>
+                                <th>#</th>
+                                <th>Fecha contrato</th>
+                                <th>ID del contrato</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <% if (contratos[0] != undefined) {%>
+                        <tbody id="contratos">
+                        <% for (let index = 0; index < contratos[0].length; index++) { %>
+                            <tr id="tr<%=index %>"  >
+                                <td><%=index+1 %> </td>
+                                <td  id="fecha"><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].fecha_contrato %></a></td>
+                                <td id="id"><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].id %></a></td>
+                                <% if (contratos[0][index].estatus_ == 0){%>
+                                    <td>Agendado</td>
+                                    <% }else if (contratos[0][index].estatus_ == 1){ %>
+                                        <td>Instalado</td>
+                                    <% }else if(contratos[0][index].estatus_ == 2){ %>
+                                        <td>Finalizado</td>
+                                    <% } %>
+                            </tr> 
+                        <% } %>
+                        </tbody>
+                    </table>
+                  </div>
+                <% }else{ %>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr> 
+                <% } %>
+                </tbody>
+            </table>
+
 
         </section>
 <!--Menu superior--><% }else { %>
@@ -203,42 +281,6 @@
     <%- include("partials/_footer") %>
 
     <!--Carga de archivos js-->
-    <script src="/styles/scriptindex.js"></script> 
-    <script src="contratistas-styles/js/jquery-1.9.1.min.js"></script>
-    <script src="contratistas-styles/js/bootstrap.min.js"></script>
-    <script src="contratistas-styles/js/owl.carousel.min.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function() {
-            $(".owl-carousel").owlCarousel({
-                loop: true,
-                margin: 0,
-                nav: true,
-                autoWidth: false,
-                navText: ['<i class="fa fa-arrow-circle-left" title="Anterior"></i>', '<i class="fa  fa-arrow-circle-right" title="Siguiente"></i>'],
-                responsive: {
-                    0: {
-                        items: 1
-                    },
-                    500: {
-                        items: 2,
-                        margin: 20
-                    },
-                    800: {
-                        items: 3,
-                        margin: 20
-                    },
-                    1000: {
-                        items: 4,
-                        margin: 20
-                    }
-                }
-            });
-        });
-    </script>
-    <script src="/contratistas-styles/js/wow.min.js"></script>
-    <script src="/contratistas-styles/js/smooth-scroll.min.js"></script>
-    <script src="/contratistas-styles/js/sitio.js"></script>
-    <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
     <script src="/styles/sweetalert210.js"></script>
     <% if (typeof alert != "undefined")  { %>
       <script>
@@ -253,9 +295,6 @@
    })
         </script>
         <% } %>
-    <script type="text/javascript">
-        const socket = io()
-    </script>
 </body>
 
 </html>

@@ -19,7 +19,7 @@ import {
     updateContrat,
     updateContratMethod,
     deleteContrat,
-    loginEditContratistaAuth,
+    loginContratistaAuth,
     loadContratista,
     deleteContratista,
     updateContratista,
@@ -29,7 +29,8 @@ import {
     uploadContratMethodXML,
     jsonrender,
     filtroContratos,
-    FinishContrat
+    FinishContrat,
+    filtroContratistas
 } from '../controllers/Controller.js'
 const router = Router();
 
@@ -49,7 +50,8 @@ router.get('/update-contrato/:id', updateContrat)
 router.post('/update-contrato/:id', updateContratMethod)
 router.get ('/delete-contrato/:id', deleteContrat)
 router.get ('/finish-contrato/:id', FinishContrat)
-router.get('/contratista', loginEditContratistaAuth)
+router.get('/contratista', loginContratistaAuth)
+router.post('/contratista', filtroContratistas)
 router.get('/contratista/:id', loadContratista)
 router.get('/update-contratista/:id', updateContratista)
 router.post('/update-contratista/:id', updateContratistaMethod)
