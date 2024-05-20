@@ -44,6 +44,11 @@ body {
   margin-bottom: 20px;
 }
 
+.form-register p {
+  padding: 0;
+  margin: 0;
+}
+
 .controls {
   width: 100%;
   background: #24303c;

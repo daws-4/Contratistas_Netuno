@@ -9,26 +9,43 @@
         <section class="form-register">
           <h4>REGISTRAR CONTRATO</h4>
           <form action="" method="POST">
-          <input class="controls" type="text" name="id" placeholder="ID del Contrato*" required tabindex="1" autofocus>
+            <label for="id">ID de la ONT*</label>
+          <input class="controls" type="text" name="id" placeholder="ID de la ONT*" required tabindex="1" autofocus>
+            <label for="name_contrato">Fecha del Contrato*</label>
           <input class="controls" type="date" name="fecha_contrato" placeholder="Fecha del Contrato*" required tabindex="2">
+            <label for="estatus_">Estatus del Contrato*</label>
           <select class="controls" type="text" name="estatus_" placeholder="Estado de la Insstalación*" required tabindex="3" >
             <option value="0">Agendado</option>
             <option value="1">Emitido</option>
-          <input class="controls" type="text" name="ci_cliente" placeholder="Cédula del Cliente*" required tabindex="4" maxlength="30">  
+          </select>
+            <label for="ci_cliente">Cédula del Cliente*</label>
+          <input class="controls" type="text" name="ci_cliente" placeholder="Cédula del Cliente*" required tabindex="4" maxlength="30"> 
+            <label for="id_cuenta">ID Cuenta del Cliente*</label> 
           <input class="controls" type="text" name="id_cuenta" placeholder="ID Cuenta del Cliente*" required tabindex="5" maxlength="30">
+            <label for="plan_contratado">Plan Contratado*</label>
           <input class="controls" type="text" name="plan_contratado" placeholder="Plan Contratado*" required tabindex="6" maxlength="30">
+            <label for="direccion_contrato">Dirección del Contrato*</label>
           <input class="controls" type="text" name="direccion_contrato" placeholder="Dirección del Contrato*" required tabindex="7" >
-          <input class="controls" type="text" name="motivo_standby" placeholder="Motivo de Pausa" tabindex="8" >
+            <label for="motivo_standby">Motivo de Pausa</label>
+          <input class="controls" type="text" name="motivo_standby" placeholder="Motivo de Pausa" tabindex="8">
+            <label for="fecha_instalacion">Fecha de Instalación</label>
           <input class="controls" type="date" name="fecha_instalacion" placeholder="Fecha de Instalación" tabindex="9" >
+            <label for="recursos_inventario_instalacion">Recursos Utilizados</label>
           <input class="controls" type="text" name="recursos_inventario_instalacion" placeholder="Recursos Utilizados" tabindex="10" >
+            <label for="observaciones_instalacion">Observaciones</label>
           <input class="controls" type="text" name="observaciones_instalacion" placeholder="Observaciones" tabindex="11" >
+            <label for="contratista_asignado">Contratista Asignado</label>
           <input class="controls" type="text" name="contratista_asignado" placeholder="Contratista Asignado" tabindex="12" >
+            <label for="empresa_contratista">Empresa Contratista</label>
           <select class="controls" type="text" name="empresa_contratista" placeholder="Empresa Contratista" tabindex="13">
             <option value="0">Hetelca</option>
             <option value="1">Servitel</option>
+          </select>
+            <label for="telefono_cliente">Teléfono Cliente</label>
           <input class="controls" type="text" name="telefono_cliente" placeholder="Teléfono del Cliente" tabindex="14"minlength='11' maxlength="11">
+            <label for="nodo">Nodo*</label>
           <input class="controls" type="text" name="nodo" placeholder="Nodo*" required tabindex="15" >
-          
+            
           <input class="botons" type="submit" value="Registrar" tabindex="16">
           
             <label for=""></label>
@@ -65,21 +82,35 @@
     <section class="form-register">
       <h4>REGISTRAR CONTRATO</h4>
       <form action="" method="POST">
-      <input class="controls" type="text" name="id" placeholder="ID del Contrato*" required tabindex="1" autofocus>
+        <label for="id">ID de la ONT*</label>
+      <input class="controls" type="text" name="id" placeholder="ID de la ONT*" required tabindex="1" autofocus>
+        <label for="name_contrato">Fecha del Contrato*</label>
       <input class="controls" type="date" name="fecha_contrato" placeholder="Fecha del Contrato*" required tabindex="2">
       <select class="controls" type="text" name="estatus_" placeholder="Estado de la Insstalación*" required tabindex="3" >
         <option value="0">Agendado</option>
         <option value="1">Instalado</option>
-      <input class="controls" type="text" name="ci_cliente" placeholder="Cédula del Cliente*" required tabindex="4" maxlength="30">  
+      </select>
+        <label for="ci_cliente">Cédula del Cliente*</label>
+      <input class="controls" type="text" name="ci_cliente" placeholder="Cédula del Cliente*" required tabindex="4" maxlength="30">
+        <label for="id_cuenta">ID Cuenta del Cliente*</label>     
       <input class="controls" type="text" name="id_cuenta" placeholder="ID Cuenta del Cliente*" required tabindex="5" maxlength="30">
+        <label for="plan_contratado">Plan Contratado*</label>
       <input class="controls" type="text" name="plan_contratado" placeholder="Plan Contratado*" required tabindex="6" maxlength="30">
+        <label for="direccion_contrato">Dirección del Contrato*</label>
       <input class="controls" type="text" name="direccion_contrato" placeholder="Dirección del Contrato*" required tabindex="7" >
+        <label for="motivo_standby">Motivo de Pausa</label>
       <input class="controls" type="text" name="motivo_standby" placeholder="Motivo de Pausa" tabindex="8" >
+        <label for="fecha_instalacion">Fecha de Instalación</label>
       <input class="controls" type="date" name="fecha_instalacion" placeholder="Fecha de Instalación" tabindex="9" >
+        <label for="recursos_inventario_instalacion">Recursos Utilizados</label>
       <input class="controls" type="text" name="recursos_inventario_instalacion" placeholder="Recursos Utilizados" tabindex="10" >
+        <label for="observaciones_instalacion">Observaciones</label>
       <input class="controls" type="text" name="observaciones_instalacion" placeholder="Observaciones" tabindex="11" >
+        <label for="contratista_asignado">Contratista Asignado</label>
       <input class="controls" type="text" name="contratista_asignado" placeholder="Contratista Asignado" tabindex="12" >
+        <label for="telefono_cliente">Teléfono del Cliente</label>
       <input class="controls" type="text" name="telefono_cliente" placeholder="Teléfono del Cliente" tabindex="14"minlength='11' maxlength="11">
+        <label for="nodo">Nodo*</label>
       <input class="controls" type="text" name="nodo" placeholder="Nodo*" required tabindex="15" >
       
       <input class="botons" type="submit" value="Registrar" tabindex="16">

@@ -382,6 +382,12 @@ footer .container{
     }
 }
 
+
+ button .boton-subir{
+    padding: 10rem;
+    margin: 10rem;
+}
+
 .boton {
     background-color: #000;
     color: #fff;

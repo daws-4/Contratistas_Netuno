@@ -3,10 +3,13 @@ html {
 
 body {
   font-family: 'Open Sans', sans-serif;
-  color: #111111; }
+  color: #111111; 
+  background-color: #fafafae3;
+}
 
-  
+
   .welcomers{
+    padding-left: 2%; ;
     text-align: left;
     display: flex;
     margin-top: 10%;
@@ -16,10 +19,25 @@ body {
     font-weight: bold;
     padding: 1rem;
   }
-  #welcomers{
+
+  .welcomers h5{
+    padding: 1rem;
+  }
+ .titulos{
+    
     text-align: left;
     display: flex;
     padding: 1rem;
+    color: #3de4e4;
+    font-weight: bold;
+  }
+  #filtro-titulo{
+    color: black;
+  }
+
+  label{
+    cursor: text;
+    
   }
 
   .contratos_firstview{
@@ -47,7 +65,7 @@ body {
     padding: 1rem;
   }
   .principal-table tbody tr{
-    border-color: #064e4e;
+    border-color: #064c4c;
     border-style: solid;
   }
   .principal-table tbody tr td{
@@ -55,27 +73,28 @@ body {
   }
 .bienvenidos {
   color: #111111;
-  background-color: #fff;
-  height: 100vh;
-  display: -webkit-box;
-  display: -ms-flexbox;
+  
+  background-color: #fafafae3;
+  height: auto;
   display: flex;
-  margin-bottom: 10%;
+  margin-bottom: 0;
   -webkit-box-orient: vertical;
   -webkit-box-direction: normal;
-      -ms-flex-direction: column;
-          flex-direction: column; }
+  -ms-flex-direction: column;    
+  flex-direction: column; }
 
 .encabezado {
-  background: #fff;
+  background: #0074eb;
   color: #111111;
   padding: .5rem 0;
   -webkit-transition: all .5s ease;
   transition: all .5s ease; }
 
 .encabezado.fondo-menu {
-  background: #064e4e;
-  padding: 1rem 0; }
+  background: #0074eb;
+  padding: 1rem 0; 
+
+}
 
 .encabezado .container {
   display: -webkit-box;
@@ -180,7 +199,7 @@ color: white;
           flex: 1 1 auto;
   border: 0;
   border-radius: 0 5px 5px 0;
-  background: #12AFAF;
+  background: #00cc00;
   color: #fff;
   -webkit-box-flex: 0;
       -ms-flex: 0 1 auto;
@@ -209,7 +228,7 @@ color: white;
 
 #menu-principal ul a:hover,
 #menu-principal ul li.active a {
-  color: #12AFAF; }
+  color: #00cc00; }
 
 .texto-encabezado {
   -webkit-box-flex: 1;
@@ -230,7 +249,7 @@ color: white;
 
 .btn-primary {
   color: #fff;
-  background-color: #12AFAF;
+  background-color: #00cc00;
   border-color: transparent;
   -webkit-transition: all .5s ease;
   transition: all .5s ease; }
@@ -242,7 +261,7 @@ color: white;
   border-color: transparent; }
   footer{
     width: 100%;
-    position: fixed;
+    position: flex;
     bottom: 0;
     background-color: rgb(230,230,230);
 }
@@ -282,216 +301,74 @@ footer p{
   to {
     -webkit-transform: translateY(0);
             transform: translateY(0); } }
-.agencia {
-  background: #12AFAF;
-  color: #fff; }
-
-.agencia img {
-  width: 80%;
-  margin: 0 auto;
-  display: block; }
-
-.tu-mejor-eleccion h2 span {
-  color: #12AFAF; }
-
-.tu-mejor-eleccion ul,
-.tu-mejor-eleccion ul li {
-  list-style: none; }
-
-.tu-mejor-eleccion ul li .fa,
-.tu-mejor-eleccion ul li .far,
-.tu-mejor-eleccion ul li .fas {
-  font-size: 2rem;
-  background: #009500;
-  border-radius: 50%;
-  width: 4.7rem;
-  height: 4.7rem;
-  line-height: 4.7rem;
-  color: #fff; }
-
-.tu-mejor-eleccion ul li .contenedor-eleccion h4 {
-  font-size: 1.2rem;
-  font-weight: bold;
-  margin-top: .8rem; }
-
-.tu-mejor-eleccion ul li {
-  min-height: 9rem; }
-
-.servicios {
-  background-color: #111111;
-  color: #fff; }
-
-.servicios article {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  margin: 1rem 0; }
-
-.servicios img {
-  -webkit-box-flex: 0;
-      -ms-flex: 0 0 60px;
-          flex: 0 0 60px;
-  overflow: hidden;
-  margin-right: 1rem; }
-
-.servicios h3 {
-  margin: 0;
-  font-size: 1.1rem;
-  -webkit-box-flex: 1;
-      -ms-flex: 1 1 auto;
-          flex: 1 1 auto; }
-
-.servicios h3 a {
-  color: #fff;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: justify;
-      -ms-flex-pack: justify;
-          justify-content: space-between;
-  -webkit-box-align: center;
-      -ms-flex-align: center;
-          align-items: center;
-  text-decoration: none; }
-
-.servicios h3 a::after {
-  content: "\f054";
-  font-family: 'Font Awesome\ 5 Free';
-  font-weight: 900;
-  font-size: 2rem;
-  margin-left: 1rem;
-  opacity: .5;
-  position: relative;
-  left: 0;
-  -webkit-transition: all .5s ease;
-  transition: all .5s ease; }
-
-.servicios h3 a:hover::after {
-  left: -.5rem;
-  opacity: 1;
-  color: #12AFAF; }
-
-.ultimos-proyectos a {
-  text-decoration: none; }
-
-.ultimos-proyectos a h4 {
-  font-size: 1rem;
-  font-weight: bold;
-  text-align: center;
-  color: #111111; }
-
-.ultimos-proyectos .container {
-  padding-left: 0;
-  padding-right: 0; }
-
-.ultimos-proyectos .owl-nav {
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
-  -webkit-box-pack: center;
-      -ms-flex-pack: center;
-          justify-content: center;
-  margin: .3rem 0; }
-
-.ultimos-proyectos .container .owl-carousel .owl-nav .owl-prev,
-.ultimos-proyectos .container .owl-carousel .owl-nav .owl-next {
-  font-size: 3rem;
-  margin: 0 .5rem;
-  color: #12AFAF;
-  -webkit-transition: all .5s ease;
-  transition: all .5s ease; }
-
-.ultimos-proyectos .container .owl-carousel .owl-nav .owl-prev:hover,
-.ultimos-proyectos .container .owl-carousel .owl-nav .owl-next:hover {
-  color: #009500; }
-
-.piedepagina {
-  background: #111111;
-  color: #fff;
-  text-align: center;
-  font-size: .9rem; }
 
 
+/* index */
 
-.ir-arriba {
-  position: fixed;
-  bottom: 1rem;
-  right: 1rem;
-  font-size: 3rem;
-  color: #12AFAF;
-  text-decoration: none;
-  z-index: 99999;
-  line-height: 0;
-  display: none;
-  -webkit-transition: all .5s ease;
-  transition: all .5s ease; }
+      .formularios{
+        background: linear-gradient(20deg, #100a6a -5%, #150d86  , #2c21d3  );
+      }
 
-.ir-arriba:hover,
-.ir-arriba:focus {
-  outline: 0;
-  text-decoration: none;
-  color: #fff; }
+      .boton-de-subir{
+        align-items: right;
+        text-align: right;
+      }
 
-.paginas-internas .bienvenidos {
-  height: 50vh; }
 
-.paginas-internas .ruta {
-  background: #12AFAF;
-  color: #fff; }
+      .boton-subir{
+        text-align: right;
+        padding-right: 1%;
+        margin-right: 2%;
 
-.paginas-internas .ruta a {
-  color: #fff;
-  text-decoration: underline; }
+      }
 
-.paginas-internas .ruta a:hover {
-  text-decoration: none; }
+      .form-filter{
+        
+        padding: 1%;
+          
+       }
 
-.paginas-internas .card-header {
-  background: #12AFAF;
-  color: #fff;
-  display: block;
-  padding: 1rem;
-  border-radius: 5px;
-  text-decoration: none;
-  -webkit-transition: all .5s ease;
-  transition: all .5s ease; }
+      .form-filter input{
+        padding: 2px;
+        margin: 2px;
+        border-style: none;
+        border-radius: 15px;
+      }
+      .form-filter select{
+        padding: 2px;
+        margin: 2px;
+        border-style: none;
+        border-radius: 15px;
+        
+      }
+      .form-filter #btn{
+        border-radius: 2px;
+        padding: 2px;
+        margin: 2px;
+        border-style:solid ;
+        border-color: #009500;
+        color: #ffffff;
+        background-color: #119539;
+        cursor: pointer;
+      }
+      .form-filter #btn:hover{
+        background-color: #00cc00;
 
-.paginas-internas .card-header:hover {
-  background: #009500; }
+      }
 
-.paginas-internas .card-header .mb-0 .btn {
-  font-size: 1.2rem; }
+      /* #100a6a , #150d86 , #3d31e7 */
+      .form-limiter{
 
-.paginas-internas .card-header .mb-0 a {
-  display: block;
-  text-decoration: none; }
+        padding: 1%;
+      }
 
-.paginas-internas .lista-servicios {
-  background: #009500; }
+      .form-limiter select{
+        padding: 2px;
+        margin: 2px;
+        border-style: inset;
+        border-radius: 10px;
+      }
 
-.paginas-internas .lista-servicios .item-servicios {
-  background: #fff;
-  text-align: center;
-  border: 5px solid #057705;
-  border-radius: 5px;
-  margin-bottom: 1rem;
-  padding: 1rem; }
-
-.paginas-internas .lista-servicios .item-servicios .fa {
-  font-size: 6rem;
-  color: #12AFAF;
-  margin-bottom: 1rem;
-  -webkit-transition: all 1s ease;
-  transition: all 1s ease; }
-
-.paginas-internas .lista-servicios .item-servicios:hover .fa {
-  -webkit-transform: rotateY(360deg);
-          transform: rotateY(360deg);
-  -webkit-transform-style: preserve-3d;
-          transform-style: preserve-3d; }
 
 @media (min-width: 768px) {
   #menu-principal {
@@ -522,7 +399,7 @@ footer p{
 
   #menu-principal ul li.active a,
   #menu-principal ul li a:hover {
-    color: #12AFAF;
+    color: #00cc00; 
     border-bottom: 4px solid; }
 
   .logo {
@@ -530,90 +407,7 @@ footer p{
     display: -ms-flexbox;
     display: flex; }
 
-  .boton-buscar {
-    margin-left: 1rem;
-    margin-right: 0;
-    -webkit-box-ordinal-group: 3;
-        -ms-flex-order: 2;
-            order: 2; }
-
-  #bloque-buscar {
-    -webkit-box-ordinal-group: 4;
-        -ms-flex-order: 3;
-            order: 3;
-    position: absolute;
-    width: 20rem;
-    right: 3rem;
-    top: 2.8rem;
-    -webkit-transition: all .5s ease;
-    transition: all .5s ease; }
-
-  /*Seccion servicios*/
-  .servicios article {
-    margin: 1rem 0;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-        -ms-flex-direction: column;
-            flex-direction: column;
-    -webkit-box-align: center;
-        -ms-flex-align: center;
-            align-items: center;
-    text-align: center; }
-
-  .servicios img {
-    -webkit-box-flex: 0;
-        -ms-flex: 0 0 160px;
-            flex: 0 0 160px;
-    overflow: hidden;
-    margin-right: 0;
-    margin-bottom: 1rem;
-    -webkit-transition: all 1s ease;
-    transition: all 1s ease; }
-
-  .servicios article:hover img {
-    -webkit-transform: rotateY(360deg);
-            transform: rotateY(360deg);
-    -webkit-transform-style: preserve-3d;
-            transform-style: preserve-3d; }
-
-  .servicios h3 a::after {
-    display: none; }
-
-  .servicios h3 {
-    margin: 0 0 .5rem 0;
-    font-size: 1.5rem;
-    -webkit-box-flex: 0;
-        -ms-flex: 0 1 auto;
-            flex: 0 1 auto;
-    width: 100%; }
-
-  .servicios h3 a {
-    display: block;
-    width: 100%; }
-
-  .servicios p {
-    width: 100%; }
-
-  .servicios .btn-light {
-    margin-top: auto; }
-
-  /*Pagina servicios*/
-  .paginas-internas .lista-servicios .col-md-4 {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex; }
-
-  .paginas-internas .lista-servicios .item-servicios {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    -webkit-box-orient: vertical;
-    -webkit-box-direction: normal;
-        -ms-flex-direction: column;
-            flex-direction: column; }
-
-  .paginas-internas .lista-servicios .item-servicios .btn-primary {
-    margin-top: auto; } }
+  }
 @media (min-width: 992px) {
   html {
     font-size: 16px; }
@@ -621,52 +415,24 @@ footer p{
   .bienvenidos {
     background-color: #fff;
 
-  .tu-mejor-eleccion ul li {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    display: flex;
-    min-height: 7rem; }
-
-  .tu-mejor-eleccion ul li .fa,
-  .tu-mejor-eleccion ul li .far {
-    text-align: center;
-    -webkit-box-flex: 0;
-        -ms-flex: 0 1 auto;
-            flex: 0 1 auto;
-    margin-right: 1rem;
-    -webkit-transition: all 1s ease;
-    transition: all 1s ease; }
-
-  .tu-mejor-eleccion ul li:hover .fa,
-  .tu-mejor-eleccion ul li:hover .far {
-    -webkit-transform: rotateY(360deg);
-            transform: rotateY(360deg);
-    -webkit-transform-style: preserve-3d;
-            transform-style: preserve-3d;
-    background: #12AFAF; }
-
-  .contenedor-eleccion {
-    -webkit-box-flex: 1;
-        -ms-flex: 1 0 0px;
-            flex: 1 0 0px; }
-
-  .tu-mejor-eleccion ul li .contenedor-eleccion h4 {
-    margin-top: 0;
-    font-size: 1rem; }
-
-  .tu-mejor-eleccion ul:first-child .fa,
-  .tu-mejor-eleccion ul:first-child .far {
-    -webkit-box-ordinal-group: 2;
-        -ms-flex-order: 1;
-            order: 1;
-    margin-left: 1rem;
-    margin-right: 0; }
-
-  .tu-mejor-eleccion ul li p {
-    font-size: .85rem; }
   }}
 
   @media (max-width: 600px){
+    .welcomers{
+      margin-top: 20%;
+    }
+
+  .form-filter{
+    width: auto;
+    align-items: center;
+    padding: 1em;
+    margin: auto;
+    margin-top: 1em;
+    border-radius: 4px;
+    color: white;
+    
+  }
+
     .principal-table{
       padding: 1rem;
       margin: 1rem;
@@ -760,7 +526,6 @@ footer p{
     
   
     .botons-red{
-  
   background: #24303c;
   border-radius: 4px;
   margin-bottom: 16px;
@@ -768,6 +533,8 @@ footer p{
   font-family: 'calibri';
   font-size: 18px;
   color: white;
-    }
+ }
+
+
  
   }

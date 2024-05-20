@@ -19,6 +19,41 @@
 
            <% } %>
         </div>
+        <div class="estadisticas">
+
+            <table id="estadisticas" class="principal-table table-striped">
+                <thead>
+                    <th>Contratos Registrados</th>
+                    <th>Contratos Instalados</th>
+                    <th>Contratos Finalizados</th>
+                    <th>Contratos Pendientes</th>
+                </thead>
+                <tbody>
+                    <td><%=contratos[0].length %></td>
+                    <% let instalados = contratos[0].filter(status => status.estatus_ == 1) %>
+                    <td><%= instalados.length%></td>
+                    <% let finalizados = contratos[0].filter(status => status.estatus_ == 2) %>
+                    <td><%= finalizados.length %></td>
+                    <% let agendados = contratos[0].filter(status => status.estatus_ == 0) %>
+                    <td><%= agendados.length %></td>
+                </tbody>
+            </table>
+
+            <table id="estadisticas_2" class="principal-table table-striped">
+                <thead>
+                    <th>Contratos Instalados Servitel</th>
+                    <th>Contratos Pendientes Servitel</th>
+                    <th>Contratos Instalados Hetelca</th>
+                    <th>Contratos Pendientes Hetelca</th>
+                </thead>
+                <tbody>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tbody>
+            </table>
+        </div>
         <div class="contratos_firstview">
             <h6 id="welcomers"> CONTRATISTA  <%=contratos[0][0].C_Identidad %></h6>
             <table id="lista-contratos" class="principal-table table-striped">
@@ -150,6 +185,41 @@
 
               <% } %>
               </div>
+              <div class="estadisticas">
+
+                <table id="estadisticas" class="principal-table table-striped">
+                    <thead>
+                        <th>Contratos Registrados</th>
+                        <th>Contratos Instalados</th>
+                        <th>Contratos Finalizados</th>
+                        <th>Contratos Pendientes</th>
+                    </thead>
+                    <tbody>
+                        <td><%=contratos[0].length %></td>
+                        <% let instalados = contratos[0].filter(status => status.estatus_ == 1) %>
+                        <td><%= instalados.length%></td>
+                        <% let finalizados = contratos[0].filter(status => status.estatus_ == 2) %>
+                        <td><%= finalizados.length %></td>
+                        <% let agendados = contratos[0].filter(status => status.estatus_ == 0) %>
+                        <td><%= agendados.length %></td>
+                    </tbody>
+                </table>
+    
+                <table id="estadisticas_2" class="principal-table table-striped">
+                    <thead>
+                        <th>Contratos Instalados Servitel</th>
+                        <th>Contratos Pendientes Servitel</th>
+                        <th>Contratos Instalados Hetelca</th>
+                        <th>Contratos Pendientes Hetelca</th>
+                    </thead>
+                    <tbody>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tbody>
+                </table>
+            </div>
               <div class="contratos_firstview">
                 <h6 id="welcomers"> CONTRATO  <%=contratos[0][0].id %></h6>
                 <table id="lista-contratos" class="principal-table table-striped">
@@ -224,44 +294,7 @@
             <% } %>
                     <% } %>
 
-                    <table id="lista-contratos" class="principal-table table-striped">
-                        <thead> 
-                            <tr>
-                                <th>#</th>
-                                <th>Fecha contrato</th>
-                                <th>ID del contrato</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <% if (contratos[0] != undefined) {%>
-                        <tbody id="contratos">
-                        <% for (let index = 0; index < contratos[0].length; index++) { %>
-                            <tr id="tr<%=index %>"  >
-                                <td><%=index+1 %> </td>
-                                <td  id="fecha"><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].fecha_contrato %></a></td>
-                                <td id="id"><a href="/contratos/<%=contratos[0][index].id %>"><%=contratos[0][index].id %></a></td>
-                                <% if (contratos[0][index].estatus_ == 0){%>
-                                    <td>Agendado</td>
-                                    <% }else if (contratos[0][index].estatus_ == 1){ %>
-                                        <td>Instalado</td>
-                                    <% }else if(contratos[0][index].estatus_ == 2){ %>
-                                        <td>Finalizado</td>
-                                    <% } %>
-                            </tr> 
-                        <% } %>
-                        </tbody>
-                    </table>
-                  </div>
-                <% }else{ %>
-                <tbody>
-                    <tr>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                    </tr> 
-                <% } %>
-                </tbody>
-            </table>
+                    
 
 
         </section>

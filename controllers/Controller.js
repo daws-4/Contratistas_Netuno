@@ -1594,7 +1594,6 @@ export const deleteContratista = async (req,res) =>{
         
         }        
 
-
 //Método para filtrar datos de la base de datos en el index
 export const filtroContratos = async (req,res)=>{
 
@@ -3966,9 +3965,6 @@ export const filtroContratistas = async (req,res)=>{
     }
 
 }
-
-
-
 
 //función para limpiar la caché luego del logout
 app.use(function (req, res, next) {
