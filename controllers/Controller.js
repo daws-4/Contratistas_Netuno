@@ -3980,4 +3980,4 @@ export const logout = function (req, res, next) {
 req.session.destroy(() => {
   res.redirect('/') // siempre se ejecutará después de que se destruya la sesión
 })
-};
+}; 

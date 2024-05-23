@@ -22,13 +22,13 @@
         <div class="estadisticas">
 
             <table id="estadisticas" class="principal-table table-striped">
-                <thead>
+                <thead class="first-table">
                     <th>Contratos Registrados</th>
                     <th>Contratos Instalados</th>
                     <th>Contratos Finalizados</th>
                     <th>Contratos Pendientes</th>
                 </thead>
-                <tbody>
+                <tbody class="first-table">
                     <td><%=contratos[0].length %></td>
                     <% let instalados = contratos[0].filter(status => status.estatus_ == 1) %>
                     <td><%= instalados.length%></td>
@@ -40,13 +40,13 @@
             </table>
 
             <table id="estadisticas_2" class="principal-table table-striped">
-                <thead>
+                <thead class="first-table">
                     <th>Contratos Instalados Servitel</th>
                     <th>Contratos Pendientes Servitel</th>
                     <th>Contratos Instalados Hetelca</th>
                     <th>Contratos Pendientes Hetelca</th>
                 </thead>
-                <tbody>
+                <tbody class="first-table">
                     <td></td>
                     <td></td>
                     <td></td>
@@ -57,7 +57,7 @@
         </section>
         <section class="contratos">
         <div class="contratos_firstview">
-            <h6 id="filtro-titulor" class="titulos"> FILTROS</h6>
+            <h6 id="filtro-titulo" class="titulos"> FILTROS</h6>
           <div class="formularios rounded"> 
             <form action="" class="form-limiter form-inline rounded-top">
             <div class="form-group mx-sm-3">
